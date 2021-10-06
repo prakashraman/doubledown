@@ -1,0 +1,25 @@
+{
+  "name": "doubledown",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node app.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/cron": "^1.7.3",
+    "cron": "^1.8.2",
+    "node-binance-api": "^0.13.0",
+    "pino": "^6.13.3",
+    "typescript": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^16.10.3",
+    "@types/pino": "^6.3.11",
+    "ts-node": "^10.2.1"
+  }
+}
