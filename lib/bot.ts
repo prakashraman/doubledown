@@ -1,8 +1,9 @@
 import { logger } from "./init";
+import { getPrice } from "./market";
 
 interface Model {
-  symbol: String;
-  price: Number;
+  symbol: string;
+  price: number;
 }
 
 const model: Model = {
@@ -17,8 +18,11 @@ const model: Model = {
  * - It reads the market for average prices
  * - Checks if the currency should be bought/sold
  */
-const run = () => {
-  logger.info({ model, msg: "this is nice" });
+const run = async () => {
+  logger.info("Checking for changes ...");
+  const price = await getPrice(model.symbol);
+
+  logger.info({ ...model, price });
 };
 
 export { run };
