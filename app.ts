@@ -1,3 +1,5 @@
+require("newrelic");
+
 import { CronJob } from "cron";
 
 import { run } from "./lib/bot";
