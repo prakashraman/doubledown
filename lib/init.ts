@@ -1,6 +1,8 @@
-import pino from "pino";
+import { createLogger, transports } from "winston";
 
 /**
  * The main logger
  */
-export const logger = pino();
+export const logger = createLogger({
+  transports: [new transports.Console()],
+});
