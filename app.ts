@@ -8,7 +8,7 @@ import { logger } from "./lib/init";
  *
  * Go through the "run" method to figure things out.
  */
-const job = new CronJob("*/5 * * * * *", run, () => {
+const job = new CronJob("*/15 * * * * *", run, () => {
   logger.info("Thank you! Come again");
 });
 
