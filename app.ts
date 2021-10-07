@@ -9,7 +9,7 @@ import { logger } from "./lib/init";
  * Go through the "run" method to figure things out.
  */
 
-logger.info("Starting worker ...");
+logger.info("Starting worker ...", { time: new Date() });
 
 const job = new CronJob("*/15 * * * * *", run, () => {
   logger.info("Thank you! Come again");
