@@ -25,6 +25,8 @@
   },
   "devDependencies": {
     "@types/node": "^16.10.3",
+    "prettier": "^2.4.1",
+    "prettier-plugin-jsdoc": "^0.3.24",
     "ts-node": "^10.2.1"
   }
 }
