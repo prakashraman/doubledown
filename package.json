@@ -8,7 +8,8 @@
     "build": "tsc",
     "postinstall": "npm run build",
     "dev": "ts-node app.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "npx eslint app.ts lib"
   },
   "keywords": [],
   "author": "",
@@ -20,13 +21,17 @@
     "cron": "^1.8.2",
     "newrelic": "^8.4.0",
     "node-binance-api": "^0.13.0",
-    "typescript": "^4.4.3",
     "winston": "^3.3.3"
   },
   "devDependencies": {
     "@types/node": "^16.10.3",
+    "@typescript-eslint/eslint-plugin": "^5.1.0",
+    "@typescript-eslint/parser": "^5.1.0",
+    "eslint": "^8.1.0",
+    "husky": "^7.0.4",
     "prettier": "^2.4.1",
     "prettier-plugin-jsdoc": "^0.3.24",
-    "ts-node": "^10.2.1"
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.4"
   }
 }

@@ -1,4 +1,3 @@
-import { ModuleResolutionKind } from "typescript";
 import { logger } from "./init";
 import { getPrice } from "./market";
 
@@ -11,8 +10,6 @@ const model: Model = {
   symbol: "BTCUSDT",
   price: 50000,
 };
-
-// type Level = "single" | "double" | "tripple";
 
 enum Level {
   Single = "single",
@@ -92,7 +89,5 @@ const getNextPurchaseLevel = (): Level | null => {
 const getPriceAtLevel = (model: Model, level: Level): number => {
   return model.price - (PURCHASE_LEVELS[level] * model.price) / 100;
 };
-
-const checkForSell = (model: Model, price: number) => {};
 
 export { run };
