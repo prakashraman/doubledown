@@ -1,5 +1,5 @@
 import { logger } from "./init";
-import { getPrice } from "./market";
+import { getPrice, getOrder } from "./market";
 
 interface Model {
   symbol: string;
@@ -42,12 +42,15 @@ const PURCHASE_LEVELS: PurchaseLevel = {
  * - Checks if the currency should be bought/sold
  */
 const run = async () => {
-  logger.info("Checking for changes ...");
+  // logger.info("Checking for changes ...");
 
-  const price = await getPrice(model.symbol);
+  // const price = await getPrice(model.symbol);
 
-  logger.info({ ...model, price });
-  checkForPurchase(model, price);
+  // logger.info({ ...model, price });
+  // checkForPurchase(model, price);
+
+  const status = await getOrder("ONTUSDT", "1016500835");
+  console.log("it", status.status);
 };
 
 /**
