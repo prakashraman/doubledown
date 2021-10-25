@@ -43,14 +43,13 @@ const PURCHASE_LEVELS: PurchaseLevel = {
  */
 const run = async () => {
   // logger.info("Checking for changes ...");
-
   // const price = await getPrice(model.symbol);
-
   // logger.info({ ...model, price });
   // checkForPurchase(model, price);
+  // const status = await getOrder("ONTUSDT", "1016500835");
+  // console.log("it", status.status);
 
-  const status = await getOrder("ONTUSDT", "1016500835");
-  console.log("it", status.status);
+  logger.info("doing nothing, for now ...");
 };
 
 /**
