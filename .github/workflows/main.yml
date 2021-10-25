@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Lint
         run: |
-          npm i 
+          npm i --ingore-scripts
           npm run lint
       - uses: akhileshns/heroku-deploy@v3.12.12
         with:
