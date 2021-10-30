@@ -10,8 +10,8 @@ interface Model {
 }
 
 const model: Model = {
-  symbol: "BTCUSDT",
-  price: 70000,
+  symbol: "HOTBUSD",
+  price: 1,
 };
 
 /**

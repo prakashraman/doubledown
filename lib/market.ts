@@ -75,13 +75,29 @@ const createBuyLimitOrder = async ({
   price,
   quantity,
 }: CreateBuyLimitOrderProps) => {
-  if (await isBuyLocked(symbol)) {
-    logger.info("symbol is buy locked", { symbol });
-    return;
-  }
+  // if (await isBuyLocked(symbol)) {
+  //   logger.info("symbol is buy locked", { symbol });
+  //   return;
+  // }
 
   logger.info("new buy limit order", { symbol, price, quantity });
   setBuyLock(symbol);
+  // binance.buy(
+  //   symbol,
+  //   1881.122222,
+  //   0.0056,
+  //   { type: "LIMIT" },
+  //   (error, response) => {
+  //     console.log({ error, response });
+  //     console.log("[after this]");
+  //   }
+  // );
+
+  logger.info("rounded", { amount: binance.roundStep(1881.122222, "0.1") });
+  const info = await getExchangeInfo("HOTBUSD");
+  logger.info({ symbol, info });
+
+  // 0.1;
 };
 
 /**
@@ -104,6 +120,40 @@ const setBuyLock = async (symbol: string) => {
 const isBuyLocked = async (symbol: string): Promise<boolean> => {
   const value = await db.get(`buylock:${symbol}`);
   return toBoolean(value);
+};
+
+/**
+ * Retrieve the exchange info for a symbol from binance.
+ *
+ * The method first checks the cache else queries the binance api.
+ *
+ * @param {string} symbol
+ * @returns Promise
+ */
+const getExchangeInfo = async (symbol: string): Promise<any> => {
+  const dbkey = `exchangeinfo:${symbol}`;
+  return new Promise<any>(async (resolve, reject) => {
+    const cached = await db.get(dbkey);
+
+    if (!!cached) {
+      return resolve(JSON.parse(cached));
+    }
+
+    binance.exchangeInfo((error, data) => {
+      for (let item of data.symbols) {
+        if (item.symbol === symbol) {
+          db.set(dbkey, JSON.stringify(item));
+          resolve(item);
+
+          return;
+        }
+      }
+
+      if (error) {
+        return reject(error);
+      }
+    });
+  });
 };
 
 export { binance, getPrice, getOrder, createBuyLimitOrder };

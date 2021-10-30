@@ -13,8 +13,10 @@ import { logger } from "./lib/init";
 
 logger.info("Starting worker ...", { time: new Date() });
 
-const job = new CronJob("*/3  * * * * *", run, () => {
-  logger.info("Thank you! Come again");
-});
+// const job = new CronJob("*/3  * * * * *", run, () => {
+//   logger.info("Thank you! Come again");
+// });
 
-job.start();
+// job.start();
+
+run();
