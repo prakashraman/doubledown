@@ -14,7 +14,13 @@ enum Level {
  * - Tripple = 10%
  */
 type PurchaseLevel = {
-  [key in Level]: number;
+  [key in Level]: PurchaseLevelMeta;
+};
+
+type PurchaseLevelMeta = {
+  buyAtDropPercent: number;
+  usd: number;
+  sellAtJumpPercent: number;
 };
 
 /**

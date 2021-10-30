@@ -18,6 +18,7 @@
     "@logtail/node": "^0.1.10",
     "@logtail/winston": "^0.1.10",
     "@types/cron": "^1.7.3",
+    "boolean": "^3.1.4",
     "cron": "^1.8.2",
     "newrelic": "^8.4.0",
     "node-binance-api": "^0.13.0",
