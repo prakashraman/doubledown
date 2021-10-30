@@ -2,21 +2,13 @@ import Binance from "node-binance-api";
 
 import CONFIG from "./config";
 import { logger } from "./init";
+import { OrderStatus } from "./types";
 
 /** The "binance" api */
 const binance: Binance = new Binance().options({
   APIKEY: CONFIG.BINANCE_API_KEY,
   APISECRET: CONFIG.BINANCE_API_SECRET,
 });
-
-type OrderStatus = {
-  symbol: string;
-  orderId: number;
-  price: string;
-  status: string;
-  type: string;
-  side: "BUY" | "SELL";
-};
 
 /**
  * Retrieves the current price from binace for a given symbol
@@ -26,6 +18,7 @@ type OrderStatus = {
  */
 const getPrice = async (symbol: string): Promise<number> => {
   const ticker = await binance.prices(symbol);
+
   return (ticker as { [key: string]: number })[symbol];
 };
 

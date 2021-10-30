@@ -13,7 +13,7 @@ import { logger } from "./lib/init";
 
 logger.info("Starting worker ...", { time: new Date() });
 
-const job = new CronJob("*/15 * * * * *", run, () => {
+const job = new CronJob("*/3  * * * * *", run, () => {
   logger.info("Thank you! Come again");
 });
 

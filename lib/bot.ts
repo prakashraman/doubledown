@@ -1,5 +1,7 @@
 import { logger } from "./init";
 import { getPrice, getOrder } from "./market";
+import * as db from "./db";
+import { Purchase, PurchaseLevel, Level } from "./types";
 
 interface Model {
   symbol: string;
@@ -9,16 +11,6 @@ interface Model {
 const model: Model = {
   symbol: "BTCUSDT",
   price: 50000,
-};
-
-enum Level {
-  Single = "single",
-  Double = "double",
-  Tripple = "tripple",
-}
-
-type PurchaseLevel = {
-  [key in Level]: number;
 };
 
 /**
@@ -42,14 +34,13 @@ const PURCHASE_LEVELS: PurchaseLevel = {
  * - Checks if the currency should be bought/sold
  */
 const run = async () => {
-  // logger.info("Checking for changes ...");
-  // const price = await getPrice(model.symbol);
-  // logger.info({ ...model, price });
+  logger.info("Checking for changes ...");
+  const price = await getPrice(model.symbol);
+  logger.info({ ...model, price });
+
   // checkForPurchase(model, price);
   // const status = await getOrder("ONTUSDT", "1016500835");
   // console.log("it", status.status);
-
-  logger.info("doing nothing, for now ...");
 };
 
 /**
@@ -58,8 +49,8 @@ const run = async () => {
  * @param {Model} model
  * @param {number} price
  */
-const checkForPurchase = (model: Model, currentPrice: number) => {
-  const nextLevel = getNextPurchaseLevel();
+const checkForPurchase = async (model: Model, currentPrice: number) => {
+  const nextLevel = await getNextPurchaseLevel();
   const nextPrice = getPriceAtLevel(model, nextLevel);
   const symbol = model.symbol;
 
@@ -73,11 +64,13 @@ const checkForPurchase = (model: Model, currentPrice: number) => {
 /**
  * Deterrines the next purchase level.
  *
- * If there are no current existing puchases it will return a 'single' level
+ * If there are no current existing puchases it will return a 'single' level. If
+ * the function return 'null' that implies that all the levels of purchases are
+ * complete and we should not be purchasing anymore.
  *
  * @returns {Level | null}
  */
-const getNextPurchaseLevel = (): Level | null => {
+const getNextPurchaseLevel = async (): Promise<Level | null> => {
   return Level.Single;
 };
 

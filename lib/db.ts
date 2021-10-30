@@ -49,4 +49,25 @@ const getClient = async (): Promise<RedisClientType> => {
   return client;
 };
 
-export { getClient };
+/**
+ * Set key in redis database
+ *
+ * @param {string} key
+ * @param {any} value
+ * @returns {Promise<string>}
+ */
+const set = async (key: string, value: any): Promise<string> => {
+  return (await getClient()).set(key, value);
+};
+
+/**
+ * Get a key from the redis database
+ *
+ * @param {string} key
+ * @returns Promise
+ */
+const get = async (key: string): Promise<string> => {
+  return (await getClient()).get(key);
+};
+
+export { getClient, get, set };
