@@ -3,7 +3,7 @@ import { filter, map, each, remove } from "lodash";
 import { logger } from "./init";
 import { getPrice, getOrder } from "./market";
 import * as db from "./db";
-import { createLimitOrder, getTradeInfo } from "./market";
+import { createLimitOrder, getTradeInfo, isLocked } from "./market";
 import {
   Purchase,
   PurchaseLevel,
@@ -65,24 +65,17 @@ const getPurchaseLevelMeta = (level: Level): PurchaseLevelMeta => {
  * - Checks if the currency should be bought/sold
  */
 const run = async () => {
-  // logger.info("Checking for changes ...");
-  // const price = await getPrice(model.symbol);
-  // logger.info({ ...model, price });
-  // await checkForPurchase(model, price);
-  // const status = await getOrder("HOTBUSD", "39840472");
-  // console.log({ status });
-  // createLimitOrder({
-  //   symbol: "HOTBUSD",
-  //   price: 0.0126600002222,
-  //   quantity: 1996.0997772222,
-  //   side: "SELL",
-  // })
-  //   .then((r) => {
-  //     console.log({ r });
-  //   })
-  //   .catch((e) => {
-  //     console.error(e);
-  //   });
+  const { symbol } = model;
+  if (await isLocked(symbol)) {
+    logger.info("skipping run as symbol is locked", { symbol });
+    return;
+  }
+  logger.info("run", { symbol });
+
+  const price = await getPrice(model.symbol);
+
+  await checkForPurchase(model, price);
+  await checkForSell(model, price);
 };
 
 /**
@@ -106,25 +99,24 @@ const checkForPurchase = async (model: Model, currentPrice: number) => {
   const price = getPriceAtLevel(model, level);
   const symbol = model.symbol;
 
-  if (currentPrice < price) {
-    logger.info("Purchase Now!", { symbol, currentPrice, price });
-    try {
-      const result = await createLimitOrder({
-        symbol,
-        price,
-        side: "BUY",
-        quantity: getBuyQuantityForLevel({
-          price,
-          level,
-        }),
-      });
+  if (currentPrice > price) return;
 
-      registerPurhcase(result, level);
-    } catch (err) {
-      logger.error("purchase failed", { err });
-    }
-  } else {
-    logger.error("Don't purhcase now", { symbol });
+  logger.info("purchase symbol", { symbol, price, level });
+
+  try {
+    const result = await createLimitOrder({
+      symbol,
+      price,
+      side: "BUY",
+      quantity: getBuyQuantityForLevel({
+        price,
+        level,
+      }),
+    });
+
+    await registerPurhcase(result, level);
+  } catch (err) {
+    logger.error("purchase failed", { err });
   }
 };
 
@@ -178,13 +170,20 @@ const getNextPurchaseLevel = async (symbol: string): Promise<Level | null> => {
   return Level.Single;
 };
 
+/**
+ * Determines if any of the purchases should be sold off. This method looks for
+ * the first sellable purchase from the list
+ *
+ * @param {Model} model
+ * @param {number} currentPrice
+ */
 const checkForSell = async (model: Model, currentPrice: number) => {
   const active = await getPurchasesOf(model.symbol);
   const sellable = active.find((p) => p.sellAtPrice <= currentPrice);
   if (!sellable) return;
 
   const { symbol, level } = sellable;
-  logger.info("selling symbol", { symbol, level });
+  logger.info("sell symbol", { symbol, level, orderId: sellable.id });
 
   try {
     const result = createLimitOrder({

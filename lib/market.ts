@@ -302,4 +302,11 @@ const adjustSymbolPriceAndQuantity = async ({
   };
 };
 
-export { binance, getPrice, getOrder, createLimitOrder, getTradeInfo };
+export {
+  binance,
+  getPrice,
+  getOrder,
+  createLimitOrder,
+  getTradeInfo,
+  isLocked,
+};
