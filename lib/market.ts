@@ -37,7 +37,7 @@ const getPrice = async (symbol: string): Promise<number> => {
  */
 const getOrder = async (
   symbol: string,
-  orderId: string
+  orderId: string | number
 ): Promise<OrderStatus> => {
   return new Promise<OrderStatus>((resolve, reject) => {
     binance.orderStatus(
@@ -61,6 +61,7 @@ type CreateBuyLimitOrderProps = {
 };
 
 type CreateBuyLimitOrderResult = {
+  price: number;
   orderId: number;
   status: string;
   symbol: string;
@@ -98,8 +99,6 @@ const createBuyLimitOrder = async ({
       quantity: 11100.2323435,
     });
 
-    logger.info({ adjusted });
-
     binance.buy(
       symbol,
       adjusted.quantity,
@@ -111,8 +110,9 @@ const createBuyLimitOrder = async ({
           resolve({
             orderId: response.orderId,
             symbol,
+            price: +response.price, // the sugar "+" ensure the price is a number
             status: response.status,
-            quantity: response.origQty,
+            quantity: +response.origQty, // see above comment,
           });
 
           removeBuyLock(symbol);

@@ -50,13 +50,22 @@ type Purchase = {
    * - E.g. If bought at a 2% then, then should be sold which back up by 1.5%
    * - E.g. If bought at a 5% then, then should be sold which back up by 3%
    */
-  sellAt?: number;
+  sellAt: number;
 
   /** Time at which the BUY limit was initiated */
   time: Date;
 
   /** The level at which the purchase happened */
   level: Level;
+};
+
+type PurchaseInPlay = {
+  symbol: string;
+  purchasedWithOrderId: number;
+  purchasedAtPrice: number;
+  purchasedAtLevel: Level;
+  sellAtPrice: number;
+  quantity: number;
 };
 
 /* --------------- BINANCE TYPES ------------- */
@@ -69,4 +78,11 @@ type OrderStatus = {
   side: "BUY" | "SELL";
 };
 
-export { Purchase, PurchaseLevel, Level, OrderStatus };
+export {
+  PurchaseInPlay,
+  Purchase,
+  PurchaseLevel,
+  PurchaseLevelMeta,
+  Level,
+  OrderStatus,
+};

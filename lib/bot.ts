@@ -1,8 +1,18 @@
+import { filter, map, each } from "lodash";
+
 import { logger } from "./init";
 import { getPrice, getOrder } from "./market";
 import * as db from "./db";
 import { createBuyLimitOrder } from "./market";
-import { Purchase, PurchaseLevel, Level } from "./types";
+import {
+  Purchase,
+  PurchaseLevel,
+  Level,
+  PurchaseInPlay,
+  PurchaseLevelMeta,
+} from "./types";
+import { increaseByPercent } from "./utils";
+import CONFIG from "./config";
 
 interface Model {
   symbol: string;
@@ -40,6 +50,10 @@ const PURCHASE_LEVELS: PurchaseLevel = {
   },
 };
 
+const getPurchaseLevelMeta = (level: Level): PurchaseLevelMeta => {
+  return PURCHASE_LEVELS[level];
+};
+
 /**
  * The main entry function which does all the magic
  *
@@ -53,9 +67,60 @@ const run = async () => {
   const price = await getPrice(model.symbol);
   logger.info({ ...model, price });
 
-  checkForPurchase(model, price);
+  await checkForPendingPurchases(model.symbol);
+  await checkForPurchase(model, price);
   // const status = await getOrder("ONTUSDT", "1016500835");
   // console.log("it", status.status);
+};
+
+/**
+ * Interate through all of the limit buy order which were placed. And move the
+ * FILLED orders into a "inplay" list.
+ *
+ * It also removes any CANCELED orders
+ *
+ * @param {string} symbol
+ */
+const checkForPendingPurchases = async (symbol: string) => {
+  const pending = await getPendingPurchasesOf(symbol);
+  if (pending.length === 0) return;
+
+  const remainingPending: Purchase[] = [];
+  const inplayPurchases: PurchaseInPlay[] = [];
+
+  await Promise.all(
+    map(pending, async (p) => {
+      const orderStatus = await getOrder(p.symbol, p.orderId);
+
+      if (orderStatus.status === "CANCELED") {
+        logger.info("removing order as it seems to be canceled", {
+          orderId: p.orderId,
+          status: orderStatus.status,
+        });
+
+        return;
+      }
+
+      if (orderStatus.status === "FILLED") {
+        const inplay: PurchaseInPlay = {
+          purchasedWithOrderId: p.orderId,
+          symbol: p.symbol,
+          purchasedAtPrice: p.price,
+          quantity: p.quantity,
+          sellAtPrice: p.sellAt,
+          purchasedAtLevel: p.level,
+        };
+
+        inplayPurchases.push(inplay);
+        return;
+      }
+
+      remainingPending.push(p);
+    })
+  );
+
+  savePendingPurchases(remainingPending);
+  // TODO: save the inplay
 };
 
 /**
@@ -67,6 +132,7 @@ const run = async () => {
 const checkForPurchase = async (model: Model, currentPrice: number) => {
   const nextLevel = await getNextPurchaseLevel();
   const nextPrice = getPriceAtLevel(model, nextLevel);
+  const levelMeta = getPurchaseLevelMeta(nextLevel);
   const symbol = model.symbol;
 
   if (currentPrice < nextPrice) {
@@ -81,15 +147,15 @@ const checkForPurchase = async (model: Model, currentPrice: number) => {
       }),
     })
       .then(async (result) => {
-        console.log("in the then", { result });
         const purchase: Purchase = {
           orderId: result.orderId,
           symbol: result.symbol,
-          price: currentPrice,
+          price: result.price,
           quantity: result.quantity,
           time: new Date(),
           level: nextLevel,
           status: result.status,
+          sellAt: increaseByPercent(result.price, levelMeta.sellAtJumpPercent),
         };
 
         await savePendingPurchase(purchase);
@@ -148,17 +214,41 @@ const getBuyQuantityForLevel = ({
   return purchaseLevel.usd / price;
 };
 
+/**
+ * Appends a purchase to the pending purchases
+ *
+ * @param {Purchase} purchase
+ */
 const savePendingPurchase = async (purchase: Purchase) => {
   const pending = await getPendingPurchases();
-  console.log({ pending });
-  return db.setJSON("pending:purhcases", [...pending, purchase]);
+  return savePendingPurchases([...pending, purchase]);
+};
+
+/**
+ * Resets the pending purchases in the database
+ *
+ * @param {Purchase[]} purchases
+ */
+const savePendingPurchases = async (purchases: Purchase[]) => {
+  return db.setJSON(CONFIG.KEY_PENDING_PURCHASES, [...purchases]);
 };
 
 const getPendingPurchases = async (): Promise<Purchase[]> => {
-  const value = await db.get("pending:purchases");
-  if (!value) return [];
+  const value = await db.getJSON(CONFIG.KEY_PENDING_PURCHASES);
+  console.log({ value });
+  if (!value) return [] as Purchase[];
 
-  return JSON.parse(value);
+  return value as Purchase[];
+};
+
+/**
+ * Return pending purhcases for a symbol
+ *
+ * @param {string} symbol
+ * @returns {Promise<Purchase[]>}
+ */
+const getPendingPurchasesOf = async (symbol: string): Promise<Purchase[]> => {
+  return filter(await getPendingPurchases(), (p) => p.symbol === symbol);
 };
 
 export { run, savePendingPurchase };

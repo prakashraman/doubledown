@@ -60,6 +60,13 @@ const set = async (key: string, value: any): Promise<string> => {
   return (await getClient()).set(key, value);
 };
 
+/**
+ * Helper method which converts the "value" to JSON before storing
+ *
+ * @param {string} key
+ * @param {any} value
+ * @returns {Promise<string>}
+ */
 const setJSON = async (key: string, value: any): Promise<string> => {
   return set(key, JSON.stringify(value));
 };
@@ -74,4 +81,16 @@ const get = async (key: string): Promise<string> => {
   return (await getClient()).get(key);
 };
 
-export { getClient, get, set, setJSON };
+/**
+ * Helper method to parse into JSON before returning
+ *
+ * @param {string} key
+ * @returns Promise
+ */
+const getJSON = async (key: string): Promise<any> => {
+  const value = await get(key);
+  logger.info({ value, key });
+  return JSON.parse(await get(key));
+};
+
+export { getClient, get, set, setJSON, getJSON };
