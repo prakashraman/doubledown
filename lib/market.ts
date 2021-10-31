@@ -1,6 +1,6 @@
 import Binance from "node-binance-api";
 import { boolean as toBoolean } from "boolean";
-import { find } from "lodash";
+import { find, reject } from "lodash";
 
 import CONFIG from "./config";
 import { logger } from "./init";
@@ -133,6 +133,8 @@ type LimitOrderResult = {
   price: number;
   quantity: number;
   side: "BUY" | "SELL";
+  commission: number;
+  filledQuantity: number;
 };
 
 const createLimitOrder = async ({
@@ -195,12 +197,15 @@ const createLimitOrder = async ({
             });
 
             if (orderStatus.status === "FILLED") {
+              const tradeInfo = await getTradeInfo(symbol, orderId);
               const args = {
                 symbol,
                 price,
-                quantity,
+                quantity: adjusted.quantity,
                 side,
                 orderId,
+                commission: tradeInfo.commission,
+                filledQuantity: adjusted.quantity - tradeInfo.commission,
               };
 
               logger.info("order filled", { ...args });
@@ -322,12 +327,18 @@ const getTradeInfo = (
   return new Promise<TradeInfoResult>((resolve, result) => {
     binance.trades(
       symbol,
-      (error, info) => {
+      (error, info: any[]) => {
         console.log({ error, info });
         if (error) {
           logger.error("trade info error", { symbol, orderId });
         } else {
-          resolve({ symbol, orderId, commission: +info.commission });
+          const trade = find(info, (i) => +i.orderId === +orderId);
+          if (!trade) {
+            logger.error("trade not found", { symbol, orderId });
+            reject(new Error("trade not found"));
+            return;
+          }
+          resolve({ symbol, orderId, commission: +trade.commission * 2 });
         }
       },
       { orderId }

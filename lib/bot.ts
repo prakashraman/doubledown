@@ -64,22 +64,18 @@ const getPurchaseLevelMeta = (level: Level): PurchaseLevelMeta => {
  */
 const run = async () => {
   logger.info("Checking for changes ...");
-  // const price = await getPrice(model.symbol);
-  // logger.info({ ...model, price });
+  const price = await getPrice(model.symbol);
+  logger.info({ ...model, price });
+  await checkForPurchase(model, price);
 
-  // await checkForPendingPurchases(model.symbol);
-  // await checkForPurchase(model, price);
   // const status = await getOrder("HOTBUSD", "39840472");
   // console.log({ status });
-  getTradeInfo(model.symbol, 39840472);
-
-  // console.log("it", status.status);
 
   // createLimitOrder({
   //   symbol: "HOTBUSD",
-  //   price: 0.011955002222,
-  //   quantity: 2000.1232423423,
-  //   side: "BUY",
+  //   price: 0.0126600002222,
+  //   quantity: 1996.0997772222,
+  //   side: "SELL",
   // })
   //   .then((r) => {
   //     console.log({ r });
@@ -87,58 +83,6 @@ const run = async () => {
   //   .catch((e) => {
   //     console.error(e);
   //   });
-};
-
-/**
- * Interate through all of the limit buy order which were placed. And move the
- * FILLED orders into a "inplay" list.
- *
- * It also removes any CANCELED orders
- *
- * @param {string} symbol
- */
-const checkForPendingPurchases = async (symbol: string) => {
-  const pending = await getPendingPurchasesOf(symbol);
-  if (pending.length === 0) return;
-
-  const remainingPending: Purchase[] = [];
-  const inplayPurchases: PurchaseInPlay[] = [];
-
-  await Promise.all(
-    map(pending, async (p) => {
-      const orderStatus = await getOrder(p.symbol, p.orderId);
-      const [status, orderId] = [orderStatus.status, p.orderId];
-
-      if (orderStatus.status === "CANCELED") {
-        logger.info("removing order. seems to be canceled", {
-          status,
-          orderId,
-        });
-
-        return;
-      }
-
-      if (orderStatus.status === "FILLED") {
-        logger.info("order filled. moving to inplay list", { status, orderId });
-        const inplay: PurchaseInPlay = {
-          purchasedWithOrderId: p.orderId,
-          symbol: p.symbol,
-          purchasedAtPrice: p.price,
-          quantity: p.quantity,
-          sellAtPrice: p.sellAt,
-          purchasedAtLevel: p.level,
-        };
-
-        inplayPurchases.push(inplay);
-        return;
-      }
-
-      remainingPending.push(p);
-    })
-  );
-
-  savePendingPurchases(remainingPending);
-  // TODO: save the inplay
 };
 
 /**
@@ -157,32 +101,6 @@ const checkForPurchase = async (model: Model, currentPrice: number) => {
 
   if (currentPrice < nextPrice) {
     logger.info("Purchase Now!", { symbol });
-
-    createBuyLimitOrder({
-      symbol,
-      price: currentPrice,
-      quantity: getBuyQuantityForLevel({
-        price: currentPrice,
-        level: nextLevel,
-      }),
-    })
-      .then(async (result) => {
-        const purchase: Purchase = {
-          orderId: result.orderId,
-          symbol: result.symbol,
-          price: result.price,
-          quantity: result.quantity,
-          time: new Date(),
-          level: nextLevel,
-          status: result.status,
-          sellAt: increaseByPercent(result.price, levelMeta.sellAtJumpPercent),
-        };
-
-        await savePendingPurchase(purchase);
-      })
-      .catch((error) => {
-        logger.error(error);
-      });
   } else {
     logger.error("Don't purhcase now", { symbol });
   }
