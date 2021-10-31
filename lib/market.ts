@@ -1,5 +1,6 @@
 import Binance from "node-binance-api";
 import { boolean as toBoolean } from "boolean";
+import { find, reject } from "lodash";
 
 import CONFIG from "./config";
 import { logger } from "./init";
@@ -59,6 +60,13 @@ type CreateBuyLimitOrderProps = {
   price: number;
 };
 
+type CreateBuyLimitOrderResult = {
+  orderId: number;
+  status: string;
+  symbol: string;
+  quantity: number;
+};
+
 /**
  * Place a buy order in binance
  *
@@ -74,30 +82,48 @@ const createBuyLimitOrder = async ({
   symbol,
   price,
   quantity,
-}: CreateBuyLimitOrderProps) => {
-  // if (await isBuyLocked(symbol)) {
-  //   logger.info("symbol is buy locked", { symbol });
-  //   return;
-  // }
+}: CreateBuyLimitOrderProps): Promise<CreateBuyLimitOrderResult> => {
+  if (await isBuyLocked(symbol)) {
+    logger.info("symbol is buy locked", { symbol });
+    return null;
+  }
 
-  logger.info("new buy limit order", { symbol, price, quantity });
-  setBuyLock(symbol);
-  // binance.buy(
-  //   symbol,
-  //   1881.122222,
-  //   0.0056,
-  //   { type: "LIMIT" },
-  //   (error, response) => {
-  //     console.log({ error, response });
-  //     console.log("[after this]");
-  //   }
-  // );
+  return new Promise<CreateBuyLimitOrderResult>(async (resolve, reject) => {
+    logger.info("new buy limit order", { symbol, price, quantity });
+    setBuyLock(symbol);
 
-  logger.info("rounded", { amount: binance.roundStep(1881.122222, "0.1") });
-  const info = await getExchangeInfo("HOTBUSD");
-  logger.info({ symbol, info });
+    const adjusted = await adjustSymbolPriceAndQuantity({
+      symbol,
+      price: 0.006343123434,
+      quantity: 11100.2323435,
+    });
 
-  // 0.1;
+    logger.info({ adjusted });
+
+    binance.buy(
+      symbol,
+      adjusted.quantity,
+      adjusted.price,
+      { type: "LIMIT" },
+      (error, response) => {
+        console.log({ error, response });
+        if (!error) {
+          resolve({
+            orderId: response.orderId,
+            symbol,
+            status: response.status,
+            quantity: response.origQty,
+          });
+
+          removeBuyLock(symbol);
+          return;
+        }
+
+        logger.error("failed to placed buy limit", { error: error.toJSON() });
+        reject(error);
+      }
+    );
+  });
 };
 
 /**
@@ -109,6 +135,15 @@ const createBuyLimitOrder = async ({
  */
 const setBuyLock = async (symbol: string) => {
   db.set(`buylock:${symbol}`, "yes");
+};
+
+/**
+ * Removes the buy lock on the symbol
+ *
+ * @param {string} symbol
+ */
+const removeBuyLock = async (symbol: string) => {
+  (await db.getClient()).del(`buylock:${symbol}`);
 };
 
 /**
@@ -154,6 +189,45 @@ const getExchangeInfo = async (symbol: string): Promise<any> => {
       }
     });
   });
+};
+
+type AdjustSymbolPriceAndQuantityProps = {
+  symbol: string;
+  price: number;
+  quantity: number;
+};
+
+/**
+ * Adjust the price and quantity for a given symbol, based on the LOT_SIZE and
+ * TICK_SIZE from binance's exhange info.
+ *
+ * If these values are not adjusted binance orders will not go through
+ *
+ * @param {AdjustSymbolPriceAndQuantityProps} props
+ * @returns Number
+ */
+const adjustSymbolPriceAndQuantity = async ({
+  symbol,
+  price,
+  quantity,
+}: AdjustSymbolPriceAndQuantityProps): Promise<{
+  price: number;
+  quantity: number;
+}> => {
+  const einfo = await getExchangeInfo(symbol);
+  const stepSize = find(
+    einfo.filters,
+    (f) => f.filterType === "LOT_SIZE"
+  ).stepSize;
+  const tickSize = find(
+    einfo.filters,
+    (f) => f.filterType === "PRICE_FILTER"
+  ).tickSize;
+
+  return {
+    price: binance.roundTicks(price, `${tickSize}`),
+    quantity: binance.roundStep(quantity, `${stepSize}`),
+  };
 };
 
 export { binance, getPrice, getOrder, createBuyLimitOrder };

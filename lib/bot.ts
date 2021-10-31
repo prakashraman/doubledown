@@ -69,8 +69,6 @@ const checkForPurchase = async (model: Model, currentPrice: number) => {
   const nextPrice = getPriceAtLevel(model, nextLevel);
   const symbol = model.symbol;
 
-  logger.info("check", { currentPrice, nextPrice });
-
   if (currentPrice < nextPrice) {
     logger.info("Purchase Now!", { symbol });
 
@@ -81,7 +79,24 @@ const checkForPurchase = async (model: Model, currentPrice: number) => {
         price: currentPrice,
         level: nextLevel,
       }),
-    });
+    })
+      .then(async (result) => {
+        console.log("in the then", { result });
+        const purchase: Purchase = {
+          orderId: result.orderId,
+          symbol: result.symbol,
+          price: currentPrice,
+          quantity: result.quantity,
+          time: new Date(),
+          level: nextLevel,
+          status: result.status,
+        };
+
+        await savePendingPurchase(purchase);
+      })
+      .catch((error) => {
+        logger.error(error);
+      });
   } else {
     logger.error("Don't purhcase now", { symbol });
   }
@@ -133,4 +148,17 @@ const getBuyQuantityForLevel = ({
   return purchaseLevel.usd / price;
 };
 
-export { run };
+const savePendingPurchase = async (purchase: Purchase) => {
+  const pending = await getPendingPurchases();
+  console.log({ pending });
+  return db.setJSON("pending:purhcases", [...pending, purchase]);
+};
+
+const getPendingPurchases = async (): Promise<Purchase[]> => {
+  const value = await db.get("pending:purchases");
+  if (!value) return [];
+
+  return JSON.parse(value);
+};
+
+export { run, savePendingPurchase };

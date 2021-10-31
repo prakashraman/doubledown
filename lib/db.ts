@@ -60,6 +60,10 @@ const set = async (key: string, value: any): Promise<string> => {
   return (await getClient()).set(key, value);
 };
 
+const setJSON = async (key: string, value: any): Promise<string> => {
+  return set(key, JSON.stringify(value));
+};
+
 /**
  * Get a key from the redis database
  *
@@ -70,4 +74,4 @@ const get = async (key: string): Promise<string> => {
   return (await getClient()).get(key);
 };
 
-export { getClient, get, set };
+export { getClient, get, set, setJSON };

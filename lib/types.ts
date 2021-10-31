@@ -30,13 +30,16 @@ type PurchaseLevelMeta = {
  */
 type Purchase = {
   /** The OrderID as returned by the market */
-  orderId: string;
+  orderId: number;
 
   /** The symbol (e.g. BTCUSDT) */
   symbol: string;
 
   /** Intended price of the the purchase */
   price: number;
+
+  /** Intended quantity of the purchase */
+  quantity: number;
 
   /** Market's status for this particular order */
   status: string;
@@ -47,7 +50,7 @@ type Purchase = {
    * - E.g. If bought at a 2% then, then should be sold which back up by 1.5%
    * - E.g. If bought at a 5% then, then should be sold which back up by 3%
    */
-  sellAt: number;
+  sellAt?: number;
 
   /** Time at which the BUY limit was initiated */
   time: Date;
