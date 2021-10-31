@@ -69,6 +69,8 @@ type PurchaseInPlay = {
 };
 
 /* --------------- BINANCE TYPES ------------- */
+
+type OrderSide = "BUY" | "SELL";
 type OrderStatus = {
   symbol: string;
   orderId: number;
@@ -85,4 +87,5 @@ export {
   PurchaseLevelMeta,
   Level,
   OrderStatus,
+  OrderSide,
 };

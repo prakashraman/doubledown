@@ -6,7 +6,8 @@
  * @returns Number
  */
 const increaseByPercent = (no: number, percent: number): number => {
-  return +no + percent / 100;
+  const value = (+no * Math.abs(percent)) / 100;
+  return +no + value * (percent < 0 ? -1 : 1);
 };
 
 export { increaseByPercent };

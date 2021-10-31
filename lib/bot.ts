@@ -3,7 +3,7 @@ import { filter, map, each } from "lodash";
 import { logger } from "./init";
 import { getPrice, getOrder } from "./market";
 import * as db from "./db";
-import { createBuyLimitOrder } from "./market";
+import { createBuyLimitOrder, createLimitOrder, getTradeInfo } from "./market";
 import {
   Purchase,
   PurchaseLevel,
@@ -64,13 +64,29 @@ const getPurchaseLevelMeta = (level: Level): PurchaseLevelMeta => {
  */
 const run = async () => {
   logger.info("Checking for changes ...");
-  const price = await getPrice(model.symbol);
-  logger.info({ ...model, price });
+  // const price = await getPrice(model.symbol);
+  // logger.info({ ...model, price });
 
-  await checkForPendingPurchases(model.symbol);
-  await checkForPurchase(model, price);
-  // const status = await getOrder("ONTUSDT", "1016500835");
+  // await checkForPendingPurchases(model.symbol);
+  // await checkForPurchase(model, price);
+  // const status = await getOrder("HOTBUSD", "39840472");
+  // console.log({ status });
+  getTradeInfo(model.symbol, 39840472);
+
   // console.log("it", status.status);
+
+  // createLimitOrder({
+  //   symbol: "HOTBUSD",
+  //   price: 0.011955002222,
+  //   quantity: 2000.1232423423,
+  //   side: "BUY",
+  // })
+  //   .then((r) => {
+  //     console.log({ r });
+  //   })
+  //   .catch((e) => {
+  //     console.error(e);
+  //   });
 };
 
 /**
@@ -91,17 +107,19 @@ const checkForPendingPurchases = async (symbol: string) => {
   await Promise.all(
     map(pending, async (p) => {
       const orderStatus = await getOrder(p.symbol, p.orderId);
+      const [status, orderId] = [orderStatus.status, p.orderId];
 
       if (orderStatus.status === "CANCELED") {
-        logger.info("removing order as it seems to be canceled", {
-          orderId: p.orderId,
-          status: orderStatus.status,
+        logger.info("removing order. seems to be canceled", {
+          status,
+          orderId,
         });
 
         return;
       }
 
       if (orderStatus.status === "FILLED") {
+        logger.info("order filled. moving to inplay list", { status, orderId });
         const inplay: PurchaseInPlay = {
           purchasedWithOrderId: p.orderId,
           symbol: p.symbol,
@@ -124,7 +142,9 @@ const checkForPendingPurchases = async (symbol: string) => {
 };
 
 /**
- * Determines if a purchase should occur at the current price
+ * Determines if a purchase should occur at the current price. And if it should
+ * purchased it creates a buy limit order and places the order into a "pending
+ * puchases list" (where futher that list is interated on to see if any are filled)
  *
  * @param {Model} model
  * @param {number} price

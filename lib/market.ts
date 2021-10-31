@@ -1,11 +1,12 @@
 import Binance from "node-binance-api";
 import { boolean as toBoolean } from "boolean";
-import { find, reject } from "lodash";
+import { find } from "lodash";
 
 import CONFIG from "./config";
 import { logger } from "./init";
-import { OrderStatus } from "./types";
+import { OrderSide, OrderStatus } from "./types";
 import * as db from "./db";
+import { increaseByPercent } from "./utils";
 
 /** The "binance" api */
 const binance: Binance = new Binance().options({
@@ -126,6 +127,115 @@ const createBuyLimitOrder = async ({
   });
 };
 
+type LimitOrderResult = {
+  orderId: number | string;
+  symbol: string;
+  price: number;
+  quantity: number;
+  side: "BUY" | "SELL";
+};
+
+const createLimitOrder = async ({
+  symbol,
+  price,
+  quantity,
+  side,
+}: {
+  symbol: string;
+  price: number;
+  quantity: number;
+  side: OrderSide;
+}): Promise<LimitOrderResult> => {
+  if (await isLocked(symbol)) {
+    logger.info("symbol locked", { symbol });
+    return;
+  }
+
+  setLock(symbol);
+
+  logger.info("limit order", {
+    symbol,
+    price,
+    quantity,
+    side,
+  });
+
+  const adjusted = await adjustSymbolPriceAndQuantity({
+    symbol,
+
+    // adjust the price by 1 percent, just to help ensure that the purchase goes through immediately
+    price: increaseByPercent(price, side === "BUY" ? 1 : -1),
+    quantity,
+  });
+
+  let timer: NodeJS.Timer = null;
+
+  const binanceFn = side === "BUY" ? binance.buy : binance.sell;
+
+  return new Promise<LimitOrderResult>((resolve, reject) => {
+    binanceFn(
+      symbol,
+      adjusted.quantity,
+      adjusted.price,
+      { type: "LIMIT" },
+      (error, response) => {
+        console.log({ error, response });
+
+        if (error) {
+          logger.error("failed to placed buy limit", { error: error.toJSON() });
+          removeLock(symbol);
+          reject(error);
+        } else if (response) {
+          timer = setInterval(async () => {
+            const orderId = response.orderId;
+            const orderStatus = await getOrder(symbol, response.orderId);
+            logger.info("order status", {
+              orderId: response.orderId,
+              ...orderStatus,
+            });
+
+            if (orderStatus.status === "FILLED") {
+              const args = {
+                symbol,
+                price,
+                quantity,
+                side,
+                orderId,
+              };
+
+              logger.info("order filled", { ...args });
+
+              clearTimeout(timer);
+              removeLock(symbol);
+              resolve({ ...args });
+            } else if (orderStatus.status === "CANCELED") {
+              logger.error("order was canceled", { orderId, symbol });
+
+              clearTimeout(timer);
+              removeLock(symbol);
+              reject(new Error("order was canceled"));
+            }
+
+            // else, it'll keep waiting for the order to be filled
+          }, 2000);
+        }
+      }
+    );
+  });
+};
+
+const setLock = async (symbol: string) => {
+  return db.setJSON(`lock:${symbol}`, { at: new Date() });
+};
+
+const removeLock = async (symbol: string) => {
+  (await db.getClient()).del(`lock:${symbol}`);
+};
+
+const isLocked = async (symbol: string) => {
+  return !!(await db.getJSON(`lock:${symbol}`));
+};
+
 /**
  * Sets a buy lock for a symbol.
  *
@@ -191,6 +301,40 @@ const getExchangeInfo = async (symbol: string): Promise<any> => {
   });
 };
 
+type TradeInfoResult = {
+  symbol: string;
+  orderId: number;
+  commission: number;
+};
+
+/**
+ * Returns the trade information. Useful to understand the fee/commission for a
+ * particular trade
+ *
+ * @param {string} symbol
+ * @param {number} orderId
+ * @returns {Promise<TradeInfoResult>} Info
+ */
+const getTradeInfo = (
+  symbol: string,
+  orderId: number
+): Promise<TradeInfoResult> => {
+  return new Promise<TradeInfoResult>((resolve, result) => {
+    binance.trades(
+      symbol,
+      (error, info) => {
+        console.log({ error, info });
+        if (error) {
+          logger.error("trade info error", { symbol, orderId });
+        } else {
+          resolve({ symbol, orderId, commission: +info.commission });
+        }
+      },
+      { orderId }
+    );
+  });
+};
+
 type AdjustSymbolPriceAndQuantityProps = {
   symbol: string;
   price: number;
@@ -230,4 +374,11 @@ const adjustSymbolPriceAndQuantity = async ({
   };
 };
 
-export { binance, getPrice, getOrder, createBuyLimitOrder };
+export {
+  binance,
+  getPrice,
+  getOrder,
+  createBuyLimitOrder,
+  createLimitOrder,
+  getTradeInfo,
+};

@@ -88,8 +88,6 @@ const get = async (key: string): Promise<string> => {
  * @returns Promise
  */
 const getJSON = async (key: string): Promise<any> => {
-  const value = await get(key);
-  logger.info({ value, key });
   return JSON.parse(await get(key));
 };
 
