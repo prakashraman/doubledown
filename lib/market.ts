@@ -4,7 +4,7 @@ import { find, reject } from "lodash";
 
 import CONFIG from "./config";
 import { logger } from "./init";
-import { OrderSide, OrderStatus } from "./types";
+import { OrderSide, OrderStatus, LimitOrderResult } from "./types";
 import * as db from "./db";
 import { increaseByPercent } from "./utils";
 
@@ -52,89 +52,6 @@ const getOrder = async (
       { orderId }
     );
   });
-};
-
-/** Props for createBuyLimitOrder function */
-type CreateBuyLimitOrderProps = {
-  symbol: string;
-  quantity: number;
-  price: number;
-};
-
-type CreateBuyLimitOrderResult = {
-  price: number;
-  orderId: number;
-  status: string;
-  symbol: string;
-  quantity: number;
-};
-
-/**
- * Place a buy order in binance
- *
- * This operation first creates a buy luck for the symbol, ensuring no futher
- * buys are attempted until the lock is lifted.
- *
- * @param {string} props.symbol
- * @param {number} props.price
- * @param {number} props.quantity
- * @param {CreateBuyLimitOrderProps} }
- */
-const createBuyLimitOrder = async ({
-  symbol,
-  price,
-  quantity,
-}: CreateBuyLimitOrderProps): Promise<CreateBuyLimitOrderResult> => {
-  if (await isBuyLocked(symbol)) {
-    logger.info("symbol is buy locked", { symbol });
-    return null;
-  }
-
-  return new Promise<CreateBuyLimitOrderResult>(async (resolve, reject) => {
-    logger.info("new buy limit order", { symbol, price, quantity });
-    setBuyLock(symbol);
-
-    const adjusted = await adjustSymbolPriceAndQuantity({
-      symbol,
-      price: 0.006343123434,
-      quantity: 11100.2323435,
-    });
-
-    binance.buy(
-      symbol,
-      adjusted.quantity,
-      adjusted.price,
-      { type: "LIMIT" },
-      (error, response) => {
-        console.log({ error, response });
-        if (!error) {
-          resolve({
-            orderId: response.orderId,
-            symbol,
-            price: +response.price, // the sugar "+" ensure the price is a number
-            status: response.status,
-            quantity: +response.origQty, // see above comment,
-          });
-
-          removeBuyLock(symbol);
-          return;
-        }
-
-        logger.error("failed to placed buy limit", { error: error.toJSON() });
-        reject(error);
-      }
-    );
-  });
-};
-
-type LimitOrderResult = {
-  orderId: number | string;
-  symbol: string;
-  price: number;
-  quantity: number;
-  side: "BUY" | "SELL";
-  commission: number;
-  filledQuantity: number;
 };
 
 const createLimitOrder = async ({
@@ -385,11 +302,4 @@ const adjustSymbolPriceAndQuantity = async ({
   };
 };
 
-export {
-  binance,
-  getPrice,
-  getOrder,
-  createBuyLimitOrder,
-  createLimitOrder,
-  getTradeInfo,
-};
+export { binance, getPrice, getOrder, createLimitOrder, getTradeInfo };

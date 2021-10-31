@@ -60,12 +60,27 @@ type Purchase = {
 };
 
 type PurchaseInPlay = {
+  id: string | number;
   symbol: string;
-  purchasedWithOrderId: number;
-  purchasedAtPrice: number;
-  purchasedAtLevel: Level;
+  level: Level;
   sellAtPrice: number;
+
+  // This will correspond to the actual filled quantity
   quantity: number;
+
+  limitOrder: LimitOrderResult;
+
+  time: Date;
+};
+
+type LimitOrderResult = {
+  orderId: number | string;
+  symbol: string;
+  price: number;
+  quantity: number;
+  side: "BUY" | "SELL";
+  commission: number;
+  filledQuantity: number;
 };
 
 /* --------------- BINANCE TYPES ------------- */
@@ -88,4 +103,5 @@ export {
   Level,
   OrderStatus,
   OrderSide,
+  LimitOrderResult,
 };

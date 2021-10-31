@@ -4,6 +4,7 @@ const CONFIG = {
   BINANCE_API_SECRET: process.env.BINANCE_API_SECRET,
 
   KEY_PENDING_PURCHASES: "pending:purchases",
+  KEY_PURCHASES: "inplay:purchases",
 };
 
 export default CONFIG;
