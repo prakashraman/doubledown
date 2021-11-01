@@ -1,5 +1,4 @@
 import Binance from "node-binance-api";
-import { boolean as toBoolean } from "boolean";
 import { find, reject } from "lodash";
 
 import CONFIG from "./config";
@@ -159,37 +158,6 @@ const isLocked = async (symbol: string) => {
 };
 
 /**
- * Sets a buy lock for a symbol.
- *
- * Expected to represent that no more purchases must happen on this symbol
- *
- * @param {string} symbol
- */
-const setBuyLock = async (symbol: string) => {
-  db.set(`buylock:${symbol}`, "yes");
-};
-
-/**
- * Removes the buy lock on the symbol
- *
- * @param {string} symbol
- */
-const removeBuyLock = async (symbol: string) => {
-  (await db.getClient()).del(`buylock:${symbol}`);
-};
-
-/**
- * Determines is the symbol is buy-locked
- *
- * @param {string} symbol
- * @returns {Promise<Boolean>}
- */
-const isBuyLocked = async (symbol: string): Promise<boolean> => {
-  const value = await db.get(`buylock:${symbol}`);
-  return toBoolean(value);
-};
-
-/**
  * Retrieve the exchange info for a symbol from binance.
  *
  * The method first checks the cache else queries the binance api.
@@ -202,12 +170,12 @@ const getExchangeInfo = async (symbol: string): Promise<any> => {
   return new Promise<any>(async (resolve, reject) => {
     const cached = await db.get(dbkey);
 
-    if (!!cached) {
+    if (cached) {
       return resolve(JSON.parse(cached));
     }
 
     binance.exchangeInfo((error, data) => {
-      for (let item of data.symbols) {
+      for (const item of data.symbols) {
         if (item.symbol === symbol) {
           db.set(dbkey, JSON.stringify(item));
           resolve(item);
@@ -241,7 +209,7 @@ const getTradeInfo = (
   symbol: string,
   orderId: number
 ): Promise<TradeInfoResult> => {
-  return new Promise<TradeInfoResult>((resolve, result) => {
+  return new Promise<TradeInfoResult>((resolve, reject) => {
     binance.trades(
       symbol,
       (error, info: any[]) => {

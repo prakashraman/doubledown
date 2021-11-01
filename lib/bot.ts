@@ -1,11 +1,10 @@
-import { filter, map, each, remove } from "lodash";
+import { filter, remove } from "lodash";
 
 import { logger } from "./init";
-import { getPrice, getOrder } from "./market";
+import { getPrice } from "./market";
 import * as db from "./db";
-import { createLimitOrder, getTradeInfo, isLocked } from "./market";
+import { createLimitOrder, isLocked } from "./market";
 import {
-  Purchase,
   PurchaseLevel,
   Level,
   PurchaseInPlay,
@@ -14,7 +13,6 @@ import {
 } from "./types";
 import { increaseByPercent } from "./utils";
 import CONFIG from "./config";
-import { pushEvalArguments } from "redis/dist/lib/commands/generic-transformers";
 
 interface Model {
   symbol: string;
@@ -23,7 +21,7 @@ interface Model {
 
 const model: Model = {
   symbol: "HOTBUSD",
-  price: 0.014227,
+  price: 0.007227,
 };
 
 /**
@@ -66,13 +64,14 @@ const getPurchaseLevelMeta = (level: Level): PurchaseLevelMeta => {
  */
 const run = async () => {
   const { symbol } = model;
+  logger.info("run", { symbol });
   if (await isLocked(symbol)) {
     logger.info("skipping run as symbol is locked", { symbol });
     return;
   }
-  logger.info("run", { symbol });
 
   const price = await getPrice(model.symbol);
+  logger.info("price", { symbol, price });
 
   await checkForPurchase(model, price);
   await checkForSell(model, price);
@@ -186,12 +185,14 @@ const checkForSell = async (model: Model, currentPrice: number) => {
   logger.info("sell symbol", { symbol, level, orderId: sellable.id });
 
   try {
-    const result = createLimitOrder({
+    createLimitOrder({
       symbol,
       price: currentPrice,
       quantity: sellable.quantity,
       side: "SELL",
     });
+
+    removePurchase(sellable);
   } catch (error) {
     logger.error("unable to sell", { error, symbol, level });
   }

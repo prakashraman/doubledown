@@ -1,5 +1,6 @@
 import { createClient } from "redis";
 import { RedisClientType } from "redis/dist/lib/client";
+import CONFIG from "./config";
 
 import { logger } from "./init";
 
@@ -9,6 +10,7 @@ import { logger } from "./init";
  * @constant RedisClient
  */
 const client = createClient({
+  url: CONFIG.REDISTOGO_URL,
   socket: {
     reconnectStrategy: (count) => {
       logger.info("retry", { count });
