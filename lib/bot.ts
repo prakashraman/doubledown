@@ -1,4 +1,4 @@
-import { filter, remove } from "lodash";
+import { filter } from "lodash";
 
 import { logger } from "./init";
 import { getPrice } from "./market";
@@ -97,6 +97,7 @@ const checkForPurchase = async (model: Model, currentPrice: number) => {
   }
 
   const price = getPriceAtLevel(model, level);
+
   const symbol = model.symbol;
 
   if (currentPrice > price) return;
@@ -106,7 +107,7 @@ const checkForPurchase = async (model: Model, currentPrice: number) => {
   try {
     const result = await createLimitOrder({
       symbol,
-      price,
+      price: currentPrice,
       side: "BUY",
       quantity: getBuyQuantityForLevel({
         price,
@@ -116,6 +117,7 @@ const checkForPurchase = async (model: Model, currentPrice: number) => {
 
     await registerPurhcase(result, level);
   } catch (err) {
+    console.log({ err });
     logger.error("purchase failed", { err });
   }
 };
@@ -186,14 +188,14 @@ const checkForSell = async (model: Model, currentPrice: number) => {
   logger.info("sell symbol", { symbol, level, orderId: sellable.id });
 
   try {
-    createLimitOrder({
+    await createLimitOrder({
       symbol,
       price: currentPrice,
       quantity: sellable.quantity,
       side: "SELL",
     });
 
-    removePurchase(sellable);
+    await removePurchase(sellable);
   } catch (error) {
     logger.error("unable to sell", { error, symbol, level });
   }
@@ -281,10 +283,11 @@ const getPurchasesOf = async (symbol: string): Promise<PurchaseInPlay[]> => {
 const removePurchase = async (
   purchase: PurchaseInPlay
 ): Promise<PurchaseInPlay[]> => {
-  const updated = remove(
+  const updated = filter(
     await getPurchases(),
-    (p) => `${p.id}` === `${purchase.id}`
+    (p) => `${p.id}` != `${purchase.id}`
   );
+
   await setPurchases(updated);
 
   return updated;

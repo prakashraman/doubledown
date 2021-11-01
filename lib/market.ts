@@ -1,5 +1,5 @@
 import Binance from "node-binance-api";
-import { find, reject } from "lodash";
+import { find } from "lodash";
 
 import CONFIG from "./config";
 import { logger } from "./init";
