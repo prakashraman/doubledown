@@ -72,7 +72,7 @@ const run = async () => {
 
   const price = await getPrice(model.symbol);
 
-  await db.set(`price:${symbol}`, price);
+  await db.set(`price:${symbol}`, `${price}`);
   await checkForPurchase(model, price);
   await checkForSell(model, price);
 };
