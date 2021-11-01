@@ -71,7 +71,6 @@ const run = async () => {
   }
 
   const price = await getPrice(model.symbol);
-  logger.info("price", { symbol, price });
 
   await db.set(`price:${symbol}`, price);
   await checkForPurchase(model, price);
@@ -97,8 +96,9 @@ const checkForPurchase = async (model: Model, currentPrice: number) => {
   }
 
   const price = getPriceAtLevel(model, level);
-
   const symbol = model.symbol;
+
+  logger.info("purchase check", { currentPrice, price, level, symbol });
 
   if (currentPrice > price) return;
 
