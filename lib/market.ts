@@ -6,6 +6,7 @@ import { logger } from "./init";
 import { OrderSide, OrderStatus, LimitOrderResult } from "./types";
 import * as db from "./db";
 import { increaseByPercent } from "./utils";
+import { sendMessage } from "./notify";
 
 /** The "binance" api */
 const binance: Binance = new Binance().options({
@@ -71,12 +72,15 @@ const createLimitOrder = async ({
 
   setLock(symbol);
 
-  logger.info("limit order", {
+  const args = {
     symbol,
     price,
     quantity,
     side,
-  });
+  };
+
+  logger.info("limit order", args);
+  sendMessage(`limit order ${JSON.stringify(args)}`);
 
   const adjusted = await adjustSymbolPriceAndQuantity({
     symbol,

@@ -1,9 +1,8 @@
 import url from "url";
-
 import { createClient } from "redis";
 import { RedisClientType } from "redis/dist/lib/client";
-import CONFIG from "./config";
 
+import CONFIG from "./config";
 import { logger } from "./init";
 
 /**
@@ -64,7 +63,7 @@ client.on("error", (err) => {
 const getClient = async (): Promise<RedisClientType> => {
   if (client.isOpen) return client;
 
-  logger.info("attepting to connect redis client");
+  logger.info("attempting to connect redis client");
 
   await client.connect();
   return client;
