@@ -1,4 +1,5 @@
-import * as underscorestring from "underscore.string";
+import url from "url";
+
 import { createClient } from "redis";
 import { RedisClientType } from "redis/dist/lib/client";
 import CONFIG from "./config";
@@ -6,15 +7,28 @@ import CONFIG from "./config";
 import { logger } from "./init";
 
 /**
+ * Removed the "username" segment from the string. As redis rejects the
+ * connection is username is present
+ *
+ * @param {string} s
+ * @returns String
+ */
+const fixConnectionUrl = (s: string): string => {
+  const _url = url.parse(s);
+  _url.auth = `:${_url.auth.split(":")[1]}`;
+
+  return url.format(_url);
+};
+
+/* ----------------- CONNECTION ----------------- */
+
+/**
  * The connection will try to reconnect every 3s and stop after 3 tries
  *
  * @constant RedisClient
  */
 const client = createClient({
-  url: underscorestring
-    .trim(CONFIG.REDISTOGO_URL, "/")
-    .replace("redistogo", ""),
-  // url: "redis://redistogo:2672a7b705feab780e74a75ac6446cb5@sole.redistogo.com:10016",
+  url: fixConnectionUrl(CONFIG.REDISTOGO_URL),
 
   socket: {
     reconnectStrategy: (count) => {
@@ -98,4 +112,4 @@ const getJSON = async (key: string): Promise<any> => {
   return JSON.parse(await get(key));
 };
 
-export { getClient, get, set, setJSON, getJSON };
+export { getClient, get, set, setJSON, getJSON, fixConnectionUrl };
