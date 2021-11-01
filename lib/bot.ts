@@ -97,17 +97,18 @@ const checkForPurchase = async (model: Model, currentPrice: number) => {
 
   const price = getPriceAtLevel(model, level);
   const symbol = model.symbol;
-
-  logger.info("purchase check", {
+  const loggerArgs = {
     currentPrice,
     price,
-    level: `${level}`,
+    plevel: level,
     symbol,
-  });
+  };
+
+  logger.info("purchase check", { ...loggerArgs });
 
   if (currentPrice > price) return;
 
-  logger.info("purchase symbol", { symbol, price, level });
+  logger.info("purchase symbol", { ...loggerArgs });
 
   try {
     const result = await createLimitOrder({
