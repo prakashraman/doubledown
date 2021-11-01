@@ -98,7 +98,12 @@ const checkForPurchase = async (model: Model, currentPrice: number) => {
   const price = getPriceAtLevel(model, level);
   const symbol = model.symbol;
 
-  logger.info("purchase check", { currentPrice, price, level, symbol });
+  logger.info("purchase check", {
+    currentPrice,
+    price,
+    level: `${level}`,
+    symbol,
+  });
 
   if (currentPrice > price) return;
 
