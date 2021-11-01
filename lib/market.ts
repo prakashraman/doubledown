@@ -23,7 +23,7 @@ const binance: Binance = new Binance().options({
 const getPrice = async (symbol: string): Promise<number> => {
   const ticker = await binance.prices(symbol);
 
-  return (ticker as { [key: string]: number })[symbol];
+  return +(ticker as { [key: string]: number })[symbol]; // + sugar to convert to a number
 };
 
 /**
