@@ -26,10 +26,12 @@
     "node-binance-api": "^0.13.0",
     "redis": "^4.0.0-rc.3",
     "typedoc": "^0.22.7",
+    "underscore.string": "^3.3.5",
     "winston": "^3.3.3"
   },
   "devDependencies": {
     "@types/node": "^16.10.3",
+    "@types/underscore.string": "0.0.38",
     "@typescript-eslint/eslint-plugin": "^5.1.0",
     "@typescript-eslint/parser": "^5.1.0",
     "eslint": "^8.1.0",

@@ -1,3 +1,4 @@
+import * as underscorestring from "underscore.string";
 import { createClient } from "redis";
 import { RedisClientType } from "redis/dist/lib/client";
 import CONFIG from "./config";
@@ -10,7 +11,11 @@ import { logger } from "./init";
  * @constant RedisClient
  */
 const client = createClient({
-  url: CONFIG.REDISTOGO_URL,
+  url: underscorestring
+    .trim(CONFIG.REDISTOGO_URL, "/")
+    .replace("redistogo", ""),
+  // url: "redis://redistogo:2672a7b705feab780e74a75ac6446cb5@sole.redistogo.com:10016",
+
   socket: {
     reconnectStrategy: (count) => {
       logger.info("retry", { count });
