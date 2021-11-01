@@ -13,7 +13,7 @@ logger.info("Starting worker ...", { time: new Date() });
  *
  * Go through the "run" method to figure things out.
  */
-const job = new CronJob("*/5  * * * * *", run, () => {
+const job = new CronJob("*/10  * * * * *", run, () => {
   logger.info("Thank you! Come again");
 });
 
