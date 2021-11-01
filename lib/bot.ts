@@ -21,7 +21,7 @@ interface Model {
 
 const model: Model = {
   symbol: "HOTBUSD",
-  price: 0.01271111,
+  price: 0.01371111,
 };
 
 /**
