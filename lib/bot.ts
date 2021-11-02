@@ -1,4 +1,4 @@
-import { filter } from "lodash";
+import { filter, map } from "lodash";
 
 import { logger } from "./init";
 import { getPrice } from "./market";
@@ -19,10 +19,20 @@ interface Model {
   price: number;
 }
 
-const model: Model = {
-  symbol: "HOTBUSD",
-  price: 0.01351111,
-};
+const models: Model[] = [
+  {
+    symbol: "HOTBUSD",
+    price: 0.01351111,
+  },
+  {
+    symbol: "DOTUSDT",
+    price: 51.8,
+  },
+  {
+    symbol: "SOLUSDT",
+    price: 207.0,
+  },
+];
 
 /**
  * @constant Represents Multiple purchase level.
@@ -55,7 +65,8 @@ const getPurchaseLevelMeta = (level: Level): PurchaseLevelMeta => {
 };
 
 /**
- * The main entry function which does all the magic
+ * The main entry function which does all the magic. We iterate over the
+ * "models" and run the same logic each time
  *
  * In short:
  *
@@ -63,18 +74,24 @@ const getPurchaseLevelMeta = (level: Level): PurchaseLevelMeta => {
  * - Checks if the currency should be bought/sold
  */
 const run = async () => {
-  const { symbol } = model;
-  logger.info("run", { symbol });
-  if (await isLocked(symbol)) {
-    logger.info("skipping run as symbol is locked", { symbol });
-    return;
-  }
+  logger.info("run");
 
-  const price = await getPrice(model.symbol);
+  await Promise.all(
+    map(models, async (model) => {
+      const { symbol } = model;
 
-  await db.set(`price:${symbol}`, `${price}`);
-  await checkForPurchase(model, price);
-  await checkForSell(model, price);
+      if (await isLocked(symbol)) {
+        logger.info("skipping run as symbol is locked", { symbol });
+        return;
+      }
+
+      const price = await getPrice(model.symbol);
+
+      await db.set(`price:${symbol}`, `${price}`);
+      await checkForPurchase(model, price);
+      await checkForSell(model, price);
+    })
+  );
 };
 
 /**
