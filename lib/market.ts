@@ -227,7 +227,7 @@ const getTradeInfo = (
             reject(new Error("trade not found"));
             return;
           }
-          resolve({ symbol, orderId, commission: +trade.commission * 2 });
+          resolve({ symbol, orderId, commission: +trade.commission * 1.5 });
         }
       },
       { orderId }
