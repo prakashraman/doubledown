@@ -22,7 +22,7 @@ interface Model {
 const models: Model[] = [
   {
     symbol: "HOTBUSD",
-    price: 0.01386111,
+    price: 0.01425,
   },
   {
     symbol: "DOTUSDT",
