@@ -32,6 +32,10 @@ const models: Model[] = [
     symbol: "SOLUSDT",
     price: 207.0,
   },
+  {
+    symbol: "ETHUSDT",
+    price: 4561.0,
+  },
 ];
 
 /**
@@ -43,19 +47,19 @@ const models: Model[] = [
 const PURCHASE_LEVELS: PurchaseLevel = {
   single: {
     buyAtDropPercent: 2,
-    usd: 50,
+    usd: 70,
     sellAtJumpPercent: 1.5,
   },
 
   double: {
     buyAtDropPercent: 5,
-    usd: 100,
+    usd: 120,
     sellAtJumpPercent: 3.5,
   },
 
   tripple: {
     buyAtDropPercent: 10,
-    usd: 200,
+    usd: 210,
     sellAtJumpPercent: 7,
   },
 };
