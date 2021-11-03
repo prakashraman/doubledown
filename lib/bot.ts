@@ -26,7 +26,7 @@ const models: Model[] = [
   },
   {
     symbol: "DOTUSDT",
-    price: 51.8,
+    price: 54.0,
   },
   {
     symbol: "SOLUSDT",
@@ -34,7 +34,7 @@ const models: Model[] = [
   },
   {
     symbol: "ETHUSDT",
-    price: 4596.0,
+    price: 4646.0,
   },
 ];
 
