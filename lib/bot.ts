@@ -30,7 +30,7 @@ const models: Model[] = [
   },
   {
     symbol: "SOLUSDT",
-    price: 207.0,
+    price: 232.0,
   },
   {
     symbol: "ETHUSDT",
