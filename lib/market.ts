@@ -27,6 +27,18 @@ const getPrice = async (symbol: string): Promise<number> => {
 };
 
 /**
+ * Returns the stores price from the database.
+ *
+ * If key is not present, returns 0
+ *
+ * @param {string} symbol
+ * @returns Promise
+ */
+const getPriceFromDb = async (symbol: string): Promise<number> => {
+  return +((await db.get(`price:${symbol}`)) || 0);
+};
+
+/**
  * Retrieve the order details from binanace
  *
  * Notice the "orderId" being passed explicitly again in the "flags" as for some
@@ -281,4 +293,5 @@ export {
   createLimitOrder,
   getTradeInfo,
   isLocked,
+  getPriceFromDb,
 };

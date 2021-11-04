@@ -1,0 +1,35 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.rawgit.com/Chalarangelo/mini.css/v3.0.1/dist/mini-default.min.css"
+    />
+    <title>Doubledown // Stats</title>
+
+    <style>
+      body { padding: 20px}
+    </style>
+  </head>
+  <body>
+    <table>
+      <thead>
+        <tr>
+          <th>Coin</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each prices}}
+          <tr>
+            <td data-label="Coin">{{this.symbol}}</td>
+            <td data-label="Price">{{this.price}}</td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </body>
+</html>

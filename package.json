@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node build/app.js",
+    "start:web": "node build/web.js",
     "build": "tsc",
+    "postbuild": "cpy 'lib/web/views' 'build/lib/web/views'",
     "postinstall": "npm run build",
     "dev": "ts-node app.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -22,6 +24,8 @@
     "@types/lodash": "^4.14.176",
     "boolean": "^3.1.4",
     "cron": "^1.8.2",
+    "express": "^4.17.1",
+    "hbs": "^4.1.2",
     "lodash": "^4.17.21",
     "newrelic": "^8.4.0",
     "node-binance-api": "^0.13.0",
@@ -31,10 +35,13 @@
     "winston": "^3.3.3"
   },
   "devDependencies": {
+    "@types/express": "^4.17.13",
     "@types/node": "^16.10.3",
     "@types/underscore.string": "0.0.38",
     "@typescript-eslint/eslint-plugin": "^5.1.0",
     "@typescript-eslint/parser": "^5.1.0",
+    "cpy": "^8.1.2",
+    "cpy-cli": "^3.1.1",
     "eslint": "^8.1.0",
     "husky": "^7.0.4",
     "prettier": "^2.4.1",
