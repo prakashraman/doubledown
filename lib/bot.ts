@@ -26,11 +26,11 @@ const models: Model[] = [
   },
   {
     symbol: "DOTUSDT",
-    price: 54.0,
+    price: 55.0,
   },
   {
     symbol: "SOLUSDT",
-    price: 242.0,
+    price: 248.0,
   },
   {
     symbol: "ETHUSDT",
