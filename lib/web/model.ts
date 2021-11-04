@@ -3,12 +3,21 @@ import { map } from "lodash";
 import * as db from "../db";
 import { getPriceFromDb } from "../market";
 import { models } from "../bot";
+import { Level, PurchaseInPlay } from "../types";
 
 /* ------------------------ TYPES -------------------- */
 
 interface Coin {
   symbol: string;
   price: number;
+}
+
+interface Purchase {
+  id: string | number;
+  symbol: string;
+  sellAtPrice: string | number;
+  price: number;
+  level: Level;
 }
 
 /**
@@ -25,4 +34,14 @@ const prices = async (): Promise<Coin[]> => {
   );
 };
 
-export { prices };
+const serializePurchases = (purchases: PurchaseInPlay[]): Purchase[] => {
+  return map(purchases, (p) => ({
+    id: p.id,
+    symbol: p.symbol,
+    sellAtPrice: p.sellAtPrice.toFixed(5),
+    price: p.limitOrder.price,
+    level: p.level,
+  }));
+};
+
+export { prices, serializePurchases };
