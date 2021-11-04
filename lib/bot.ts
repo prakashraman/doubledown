@@ -22,19 +22,19 @@ interface Model {
 const models: Model[] = [
   {
     symbol: "HOTBUSD",
-    price: 0.01386111,
+    price: 0.01625,
   },
   {
     symbol: "DOTUSDT",
-    price: 51.8,
+    price: 54.0,
   },
   {
     symbol: "SOLUSDT",
-    price: 232.0,
+    price: 242.0,
   },
   {
     symbol: "ETHUSDT",
-    price: 4596.0,
+    price: 4646.0,
   },
 ];
 
