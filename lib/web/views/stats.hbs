@@ -31,5 +31,26 @@
         {{/each}}
       </tbody>
     </table>
+
+    <hr>
+    <table>
+      <caption>Purchases</caption>
+      <thead>
+        <tr>
+          <th>Coin</th>
+          <th>Level</th>
+          <th>Sell</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each purchases}}
+          <tr>
+            <td data-label="Coin">{{this.symbol}}</td>
+            <td data-label="Level">{{this.level}}</td>
+            <td data-label="Sell">{{this.sellAtPrice}}</td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
   </body>
 </html>
