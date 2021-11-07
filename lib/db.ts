@@ -50,8 +50,8 @@ const client = createClient({
  * @function
  */
 client.on("error", (err) => {
-  console.log("unable to connect to redis log", { err });
-  logger.debug("unable to connect to redis", { err });
+  console.log("unable to connect to redis log", { message: err.message });
+  logger.debug("unable to connect to redis", { message: err.message });
 });
 
 /**
