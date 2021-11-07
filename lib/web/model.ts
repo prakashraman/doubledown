@@ -34,7 +34,7 @@ const prices = async (): Promise<Coin[]> => {
         symbol: m.symbol,
         price: await getPriceFromDb(m.symbol),
         nextPurchase: nextLevel
-          ? getPriceAtLevel(m, nextLevel).toString()
+          ? `(${nextLevel}) ${getPriceAtLevel(m, nextLevel)}`
           : "-",
       };
     })
