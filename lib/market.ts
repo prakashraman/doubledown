@@ -161,14 +161,29 @@ const createLimitOrder = async ({
   });
 };
 
+/**
+ * Sets a transaction lock on a particular currency
+ *
+ * @param {string} symbol
+ */
 const setLock = async (symbol: string) => {
   return db.setJSON(`lock:${symbol}`, { at: new Date() });
 };
 
+/**
+ * Removes the transaction lock on the currency
+ *
+ * @param {string} symbol
+ */
 const removeLock = async (symbol: string) => {
   (await db.getClient()).del(`lock:${symbol}`);
 };
 
+/**
+ * Checks if the currency is locked
+ *
+ * @param {string} symbol
+ */
 const isLocked = async (symbol: string) => {
   return !!(await db.getJSON(`lock:${symbol}`));
 };

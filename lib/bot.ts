@@ -320,4 +320,4 @@ const removePurchase = async (
   return updated;
 };
 
-export { run, models, getPurchases };
+export { run, models, getPurchases, getNextPurchaseLevel, getPriceAtLevel };
