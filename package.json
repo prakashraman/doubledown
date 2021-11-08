@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node build/app.js",
     "start:web": "node build/web.js",
+    "dev:web": "ts-node web.ts",
     "build": "tsc",
     "postbuild": "cpy 'lib/web/views' 'build/lib/web/views'",
     "postinstall": "npm run build",

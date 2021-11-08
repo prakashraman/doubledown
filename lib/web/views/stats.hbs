@@ -27,7 +27,7 @@
         {{#each prices}}
           <tr>
             <td data-label="Coin">{{this.symbol}}</td>
-            <td data-label="Price">{{this.price}}</td>
+            <td data-label="Price">{{this.price}}<br><sub>{{ this.modelPrice }}</sub></td>
             <td data-label="Next Purchase">{{this.nextPurchase}}</td>
           </tr>
         {{/each}}

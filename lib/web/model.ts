@@ -1,6 +1,6 @@
 import { map } from "lodash";
 
-import { getPrice, getPriceFromDb } from "../market";
+import { getPriceFromDb } from "../market";
 import { models, getNextPurchaseLevel, getPriceAtLevel } from "../bot";
 import { Level, PurchaseInPlay } from "../types";
 
@@ -9,6 +9,7 @@ import { Level, PurchaseInPlay } from "../types";
 interface Coin {
   symbol: string;
   price: number;
+  modelPrice: number;
   nextPurchase: string | null;
 }
 
@@ -33,6 +34,7 @@ const prices = async (): Promise<Coin[]> => {
       return {
         symbol: m.symbol,
         price: await getPriceFromDb(m.symbol),
+        modelPrice: m.price,
         nextPurchase: nextLevel
           ? `(${nextLevel}) ${getPriceAtLevel(m, nextLevel)}`
           : "-",
