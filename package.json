@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node build/app.js",
     "start:web": "node build/web.js",
+    "cmd": "node build/commands.js",
     "dev:web": "ts-node web.ts",
+    "dev:cmd": "ts-node commands.ts",
     "build": "tsc",
     "postbuild": "cpy 'lib/web/views' 'build/lib/web/views'",
     "postinstall": "npm run build",
@@ -24,6 +26,7 @@
     "@types/cron": "^1.7.3",
     "@types/lodash": "^4.14.176",
     "boolean": "^3.1.4",
+    "commander": "^8.3.0",
     "cron": "^1.8.2",
     "express": "^4.17.1",
     "hbs": "^4.1.2",
