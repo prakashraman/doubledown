@@ -34,7 +34,7 @@ const models: Model[] = [
   },
   {
     symbol: "ETHUSDT",
-    price: 4785.0,
+    price: 4820.0,
   },
   {
     symbol: "CHRUSDT",
