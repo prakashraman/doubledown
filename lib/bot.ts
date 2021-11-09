@@ -52,19 +52,19 @@ const PURCHASE_LEVELS: PurchaseLevel = {
   single: {
     buyAtDropPercent: 2,
     usd: 70,
-    sellAtJumpPercent: 1.5,
+    sellAtJumpPercent: 1,
   },
 
   double: {
     buyAtDropPercent: 5,
     usd: 120,
-    sellAtJumpPercent: 3.5,
+    sellAtJumpPercent: 2.5,
   },
 
   tripple: {
     buyAtDropPercent: 10,
     usd: 210,
-    sellAtJumpPercent: 7,
+    sellAtJumpPercent: 3.5,
   },
 };
 
