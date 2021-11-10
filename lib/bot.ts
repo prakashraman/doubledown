@@ -34,11 +34,11 @@ const models: Model[] = [
   },
   {
     symbol: "ETHUSDT",
-    price: 4820.0,
+    price: 4860.0,
   },
   {
     symbol: "CHRUSDT",
-    price: 0.97,
+    price: 1.2056,
   },
 ];
 
@@ -52,7 +52,7 @@ const PURCHASE_LEVELS: PurchaseLevel = {
   single: {
     buyAtDropPercent: 2,
     usd: 70,
-    sellAtJumpPercent: 1,
+    sellAtJumpPercent: 1.1,
   },
 
   double: {
@@ -64,7 +64,7 @@ const PURCHASE_LEVELS: PurchaseLevel = {
   tripple: {
     buyAtDropPercent: 10,
     usd: 210,
-    sellAtJumpPercent: 3.5,
+    sellAtJumpPercent: 5,
   },
 };
 
