@@ -3,7 +3,7 @@ import { filter, map } from "lodash";
 import { logger } from "./init";
 import { getPrice } from "./market";
 import * as db from "./db";
-import { createLimitOrder, isLocked } from "./market";
+import { createLimitOrder, isLocked, getBalances } from "./market";
 import {
   PurchaseLevel,
   Level,

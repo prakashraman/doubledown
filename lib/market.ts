@@ -298,6 +298,11 @@ const adjustSymbolPriceAndQuantity = async ({
   };
 };
 
+const getBalances = async () => {
+  const it = await binance.balance();
+  console.log({ it });
+};
+
 export {
   binance,
   getPrice,
@@ -306,4 +311,5 @@ export {
   getTradeInfo,
   isLocked,
   getPriceFromDb,
+  getBalances,
 };
