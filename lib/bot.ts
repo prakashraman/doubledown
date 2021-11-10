@@ -102,7 +102,7 @@ const run = async () => {
 
       await db.set(`price:${symbol}`, `${price}`);
       await checkForPurchase(model, price);
-      // await checkForSell(model, price);
+      await checkForSell(model, price);
     })
   );
 };
