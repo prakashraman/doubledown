@@ -138,8 +138,6 @@ const checkForPurchase = async (model: Model, currentPrice: number) => {
 
   if (currentPrice > price) return;
 
-  logger.info("balance", { usdt: await getBalance("USDT") });
-
   if (!(await hasBalanceForPurchase(symbol, PURCHASE_LEVELS[level].usd))) {
     logger.info("insufficient balance for purchase", { plevel: level, symbol });
     return;
@@ -350,7 +348,6 @@ const hasBalanceForPurchase = async (
 ): Promise<boolean> => {
   const currency = symbol.includes("USDT") ? "USDT" : "BUSD";
 
-  logger.info("hasBalanceForPurchase", { total, symbol });
   return (await getBalance(currency)) > increaseByPercent(total, 5);
 };
 
