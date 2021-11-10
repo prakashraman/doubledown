@@ -39,6 +39,7 @@
       <caption>Purchases</caption>
       <thead>
         <tr>
+          <th>ID</th>
           <th>Coin</th>
           <th>Level</th>
           <th>Sell</th>
@@ -47,6 +48,7 @@
       <tbody>
         {{#each purchases}}
           <tr>
+            <td data-label="ID">{{this.id}}</td>
             <td data-label="Coin">{{this.symbol}}</td>
             <td data-label="Level">{{this.level}}</td>
             <td data-label="Sell">{{this.sellAtPrice}}</td>
