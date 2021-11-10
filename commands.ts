@@ -19,6 +19,6 @@ program.command(`${CMD_PURCHASE}:list`).description("list all the purchases");
 program
   .command(`${CMD_PURCHASE}:get <id>`)
   .description("retrieve a purchase")
-  .action(actions.purchaseGet);
+  .action(actions.purchases.get);
 
 program.parse(process.argv);

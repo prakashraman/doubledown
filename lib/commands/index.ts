@@ -1,1 +1,1 @@
-export { default as purchaseGet } from "./purchase.get";
+export { default as purchases } from "./purchases";

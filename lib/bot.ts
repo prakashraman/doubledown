@@ -26,7 +26,7 @@ const models: Model[] = [
   },
   {
     symbol: "DOTUSDT",
-    price: 53.14,
+    price: 52.06,
   },
   {
     symbol: "SOLUSDT",
@@ -100,7 +100,7 @@ const run = async () => {
       const price = await getPrice(model.symbol);
 
       await db.set(`price:${symbol}`, `${price}`);
-      await checkForPurchase(model, price);
+      // await checkForPurchase(model, price);
       await checkForSell(model, price);
     })
   );
