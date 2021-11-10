@@ -336,6 +336,8 @@ const removePurchase = async (
 /**
  * Checks if there is enough balance to purchase a symbol
  *
+ * Hack: Ideally we should fetch *any* currency and not just look for USDT or BUSD
+ *
  * @param {string} symbol
  * @param {number} total
  * @returns Promise<boolean>
@@ -345,7 +347,8 @@ const hasBalanceForPurchase = async (
   total: number
 ): Promise<boolean> => {
   const currency = symbol.includes("USDT") ? "USDT" : "BUSD";
-  return (await getBalance(currency)) > total;
+
+  return (await getBalance(currency)) > increaseByPercent(total, 5);
 };
 
 export { run, models, getPurchases, getNextPurchaseLevel, getPriceAtLevel };
