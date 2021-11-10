@@ -152,7 +152,6 @@ const checkForPurchase = async (model: Model, currentPrice: number) => {
 
     await registerPurhcase(result, level);
   } catch (err) {
-    console.log({ err });
     logger.error("purchase failed", { err });
   }
 };
