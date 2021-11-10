@@ -15,6 +15,6 @@ const get = (id: string) => {
  *
  * @param {string} id
  */
-const updateSellAt = async (id: string) => {};
+// const updateSellAt = async (id: string) => {};
 
 export default { get };
