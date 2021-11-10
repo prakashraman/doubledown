@@ -102,7 +102,7 @@ const run = async () => {
 
       await db.set(`price:${symbol}`, `${price}`);
       await checkForPurchase(model, price);
-      await checkForSell(model, price);
+      // await checkForSell(model, price);
     })
   );
 };
@@ -136,12 +136,14 @@ const checkForPurchase = async (model: Model, currentPrice: number) => {
 
   logger.info("purchase check", { ...loggerArgs });
 
+  if (currentPrice > price) return;
+
+  logger.info("balance", { usdt: await getBalance("USDT") });
+
   if (!hasBalanceForPurchase(symbol, PURCHASE_LEVELS[level].usd)) {
     logger.info("insufficient balance for purchase", { plevel: level, symbol });
     return;
   }
-
-  if (currentPrice > price) return;
 
   logger.info("purchase symbol", { ...loggerArgs });
 
@@ -348,6 +350,7 @@ const hasBalanceForPurchase = async (
 ): Promise<boolean> => {
   const currency = symbol.includes("USDT") ? "USDT" : "BUSD";
 
+  logger.info("hasBalanceForPurchase", { total, symbol });
   return (await getBalance(currency)) > increaseByPercent(total, 5);
 };
 
