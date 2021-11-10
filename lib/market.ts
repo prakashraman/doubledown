@@ -113,8 +113,6 @@ const createLimitOrder = async ({
       adjusted.price,
       { type: "LIMIT" },
       (error, response) => {
-        console.log({ error, response });
-
         if (error) {
           logger.error("failed to placed buy limit", { error: error.toJSON() });
           removeLock(symbol);
@@ -244,7 +242,6 @@ const getTradeInfo = (
     binance.trades(
       symbol,
       (error, info: any[]) => {
-        console.log({ error, info });
         if (error) {
           logger.error("trade info error", { symbol, orderId });
         } else {
