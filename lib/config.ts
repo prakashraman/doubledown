@@ -7,6 +7,7 @@ const CONFIG = {
 
   KEY_PENDING_PURCHASES: "pending:purchases",
   KEY_PURCHASES: "inplay:purchases",
+  KEY_BALANCES: "balances",
 };
 
 export default CONFIG;

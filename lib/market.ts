@@ -1,9 +1,15 @@
 import Binance from "node-binance-api";
-import { find } from "lodash";
+import { find, reduce } from "lodash";
 
 import CONFIG from "./config";
 import { logger } from "./init";
-import { OrderSide, OrderStatus, LimitOrderResult } from "./types";
+import {
+  OrderSide,
+  OrderStatus,
+  LimitOrderResult,
+  BalancesResponse,
+  BalancesResult,
+} from "./types";
 import * as db from "./db";
 import { increaseByPercent } from "./utils";
 import { sendMessage } from "./notify";
@@ -298,9 +304,31 @@ const adjustSymbolPriceAndQuantity = async ({
   };
 };
 
-const getBalances = async () => {
-  const it = await binance.balance();
-  console.log({ it });
+/**
+ * Queries binance and fetches the balances for all the coins. Tranforms and
+ * returns the result
+ *
+ * However it only return the balances which are > 0
+ *
+ * @returns Promise<BalancesResult>
+ */
+const getBalances = async (): Promise<BalancesResult> => {
+  const response = (await binance.balance()) as BalancesResponse;
+  const balances = reduce<BalancesResponse, BalancesResult>(
+    response,
+    (acc, item, key) => {
+      const b = +item.available;
+      if (b <= 0) return acc;
+
+      return {
+        ...acc,
+        [key]: +item.available, // cast string to number
+      };
+    },
+    {}
+  );
+
+  return balances;
 };
 
 export {

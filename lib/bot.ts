@@ -3,7 +3,7 @@ import { filter, map } from "lodash";
 import { logger } from "./init";
 import { getPrice } from "./market";
 import * as db from "./db";
-import { createLimitOrder, isLocked, getBalances } from "./market";
+import { createLimitOrder, isLocked } from "./market";
 import {
   PurchaseLevel,
   Level,
@@ -13,6 +13,7 @@ import {
 } from "./types";
 import { increaseByPercent } from "./utils";
 import CONFIG from "./config";
+import { getBalance } from "./balance";
 
 interface Model {
   symbol: string;
@@ -100,7 +101,7 @@ const run = async () => {
       const price = await getPrice(model.symbol);
 
       await db.set(`price:${symbol}`, `${price}`);
-      // await checkForPurchase(model, price);
+      await checkForPurchase(model, price);
       await checkForSell(model, price);
     })
   );
@@ -134,6 +135,11 @@ const checkForPurchase = async (model: Model, currentPrice: number) => {
   };
 
   logger.info("purchase check", { ...loggerArgs });
+
+  if (!hasBalanceForPurchase(symbol, PURCHASE_LEVELS[level].usd)) {
+    logger.info("insufficient balance for purchase", { plevel: level, symbol });
+    return;
+  }
 
   if (currentPrice > price) return;
 
@@ -325,6 +331,21 @@ const removePurchase = async (
   await setPurchases(updated);
 
   return updated;
+};
+
+/**
+ * Checks if there is enough balance to purchase a symbol
+ *
+ * @param {string} symbol
+ * @param {number} total
+ * @returns Promise<boolean>
+ */
+const hasBalanceForPurchase = async (
+  symbol: string,
+  total: number
+): Promise<boolean> => {
+  const currency = symbol.includes("USDT") ? "USDT" : "BUSD";
+  return (await getBalance(currency)) > total;
 };
 
 export { run, models, getPurchases, getNextPurchaseLevel, getPriceAtLevel };

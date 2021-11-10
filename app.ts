@@ -4,6 +4,7 @@ import { CronJob } from "cron";
 
 import { run } from "./lib/bot";
 import { logger } from "./lib/init";
+import { updateBalances } from "./lib/balance";
 import * as db from "./lib/db";
 
 logger.info("Starting worker ...", { time: new Date() });
@@ -13,9 +14,14 @@ logger.info("Starting worker ...", { time: new Date() });
  *
  * Go through the "run" method to figure things out.
  */
-const job = new CronJob("*/10  * * * * *", run, () => {
-  logger.info("Thank you! Come again");
-});
+const bot = new CronJob("*/10 * * * * *", run);
+
+/**
+ * Update the account balances
+ *
+ * Runs every minutes and updates the database with all the balances
+ */
+const balances = new CronJob("* * * * * *", updateBalances);
 
 /**
  * Meant to check the application connections before starting the job
@@ -28,7 +34,8 @@ const check = async () => {
     logger.error("check failed", { db: "no" });
   }
 
-  job.start();
+  bot.start();
+  balances.start();
 };
 
 (() => {

@@ -95,6 +95,14 @@ type OrderStatus = {
   side: "BUY" | "SELL";
 };
 
+type BalancesResponse = {
+  [key: string]: { available: string };
+};
+
+type BalancesResult = {
+  [key: string]: number;
+};
+
 export {
   PurchaseInPlay,
   Purchase,
@@ -104,4 +112,6 @@ export {
   OrderStatus,
   OrderSide,
   LimitOrderResult,
+  BalancesResponse,
+  BalancesResult,
 };
