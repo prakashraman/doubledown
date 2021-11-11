@@ -14,7 +14,7 @@ logger.info("Starting worker ...", { time: new Date() });
  *
  * Go through the "run" method to figure things out.
  */
-const bot = new CronJob("*/10 * * * * *", run);
+const bot = new CronJob("*/20 * * * * *", run);
 
 /**
  * Update the account balances

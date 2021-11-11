@@ -2,6 +2,7 @@ import { BalancesResult } from "./types";
 import { getBalances as getMarketBalances } from "./market";
 import * as db from "./db";
 import CONFIG from "./config";
+import { logger } from "./init";
 
 /**
  * Updates the balances which are fetched from the database.
@@ -9,6 +10,7 @@ import CONFIG from "./config";
  * Stored as a simple BalancesResult{[key: string]: number}
  */
 const updateBalances = async () => {
+  logger.info("balance check");
   const balances = await getMarketBalances();
 
   await db.setJSON(CONFIG.KEY_BALANCES, balances);
