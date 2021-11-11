@@ -21,7 +21,7 @@ const bot = new CronJob("*/20 * * * * *", run);
  *
  * Runs every minutes and updates the database with all the balances
  */
-const balances = new CronJob("* * * * * *", updateBalances);
+const balances = new CronJob("0 * * * * *", updateBalances);
 
 /**
  * Meant to check the application connections before starting the job
