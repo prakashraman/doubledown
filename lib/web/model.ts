@@ -1,4 +1,4 @@
-import { map } from "lodash";
+import { map, sortBy } from "lodash";
 
 import { getPriceFromDb } from "../market";
 import { models, getNextPurchaseLevel, getPriceAtLevel } from "../bot";
@@ -50,7 +50,7 @@ const prices = async (): Promise<Coin[]> => {
  * @returns Purchase
  */
 const serializePurchases = (purchases: PurchaseInPlay[]): Purchase[] => {
-  return map(purchases, (p) => ({
+  return sortBy(purchases, (p) => p.symbol).map((p) => ({
     id: p.id,
     symbol: p.symbol,
     sellAtPrice: p.sellAtPrice.toFixed(5),
