@@ -28,18 +28,21 @@ interface Purchase {
  */
 const prices = async (): Promise<Coin[]> => {
   return Promise.all(
-    map(models, async (m) => {
-      const nextLevel = await getNextPurchaseLevel(m.symbol);
+    map(
+      sortBy(models, (m) => m.symbol),
+      async (m) => {
+        const nextLevel = await getNextPurchaseLevel(m.symbol);
 
-      return {
-        symbol: m.symbol,
-        price: await getPriceFromDb(m.symbol),
-        modelPrice: m.price,
-        nextPurchase: nextLevel
-          ? `(${nextLevel}) ${getPriceAtLevel(m, nextLevel)}`
-          : "-",
-      };
-    })
+        return {
+          symbol: m.symbol,
+          price: await getPriceFromDb(m.symbol),
+          modelPrice: m.price,
+          nextPurchase: nextLevel
+            ? `(${nextLevel}) ${getPriceAtLevel(m, nextLevel)}`
+            : "-",
+        };
+      }
+    )
   );
 };
 
