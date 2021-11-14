@@ -39,7 +39,7 @@ const models: Model[] = [
   },
   {
     symbol: "CHRUSDT",
-    price: 1.24,
+    price: 1.27,
   },
   {
     symbol: "MATICUSDT",
