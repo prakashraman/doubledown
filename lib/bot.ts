@@ -31,19 +31,19 @@ const models: Model[] = [
   },
   {
     symbol: "SOLUSDT",
-    price: 242.0,
+    price: 240.0,
   },
   {
     symbol: "ETHUSDT",
-    price: 4688.0,
+    price: 4587.0,
   },
   {
     symbol: "CHRUSDT",
-    price: 1.27,
+    price: 1.30,
   },
   {
     symbol: "MATICUSDT",
-    price: 1.77,
+    price: 1.6,
   },
 ];
 
