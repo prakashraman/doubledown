@@ -1,3 +1,20 @@
+type TrackedSymbols =
+  | "HOTBUSD"
+  | "DOTUSDT"
+  | "SOLUSDT"
+  | "ETHUSDT"
+  | "CHRUSDT"
+  | "MATICUSDT";
+
+const MODEL_PRICES: Record<TrackedSymbols, number> = {
+  HOTBUSD: 0.01437,
+  DOTUSDT: 48.06,
+  SOLUSDT: 240.0,
+  ETHUSDT: 4587.0,
+  CHRUSDT: 1.316,
+  MATICUSDT: 1.6,
+};
+
 const CONFIG = {
   LOGTAIL_SOURCE_TOKEN: process.env.LOGTAIL_SOURCE_TOKEN,
   BINANCE_API_KEY: process.env.BINANCE_API_KEY,
@@ -8,6 +25,8 @@ const CONFIG = {
   KEY_PENDING_PURCHASES: "pending:purchases",
   KEY_PURCHASES: "inplay:purchases",
   KEY_BALANCES: "balances",
+
+  MODEL_PRICES,
 };
 
 export default CONFIG;

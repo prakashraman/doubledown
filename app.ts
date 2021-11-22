@@ -3,6 +3,7 @@ require("newrelic");
 import { CronJob } from "cron";
 
 import { run } from "./lib/bot";
+import collective from "./lib/bot.collective";
 import { logger } from "./lib/init";
 import { updateBalances } from "./lib/balance";
 import * as db from "./lib/db";
@@ -39,5 +40,6 @@ const check = async () => {
 };
 
 (() => {
-  check();
+  // check();
+  collective.run();
 })();

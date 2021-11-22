@@ -13,6 +13,7 @@ import {
 } from "./types";
 import { increaseByPercent } from "./utils";
 import CONFIG from "./config";
+
 import { getBalance } from "./balance";
 
 interface Model {
@@ -20,30 +21,32 @@ interface Model {
   price: number;
 }
 
+const { MODEL_PRICES } = CONFIG;
+
 const models: Model[] = [
   {
     symbol: "HOTBUSD",
-    price: 0.01437,
+    price: MODEL_PRICES.HOTBUSD,
   },
   {
     symbol: "DOTUSDT",
-    price: 48.06,
+    price: MODEL_PRICES.DOTUSDT,
   },
   {
     symbol: "SOLUSDT",
-    price: 240.0,
+    price: MODEL_PRICES.SOLUSDT,
   },
   {
     symbol: "ETHUSDT",
-    price: 4587.0,
+    price: MODEL_PRICES.ETHUSDT,
   },
   {
     symbol: "CHRUSDT",
-    price: 1.316,
+    price: MODEL_PRICES.CHRUSDT,
   },
   {
     symbol: "MATICUSDT",
-    price: 1.6,
+    price: MODEL_PRICES.MATICUSDT,
   },
 ];
 

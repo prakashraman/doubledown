@@ -12,6 +12,7 @@ import express from "express";
 import { logger } from "./lib/init";
 import { prices, serializePurchases } from "./lib/web/model";
 import { getPurchases } from "./lib/bot";
+import { getClient } from "./lib/db";
 
 /**
  * Port
@@ -31,8 +32,9 @@ app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "lib/web/views"));
 
 /** --------- ROUTES ------------ */
-app.get("/", (_req, res) => {
-  res.json({ ok: true, now: new Date() });
+app.get("/", async (_req, res) => {
+  const db = await getClient();
+  res.json({ ok: true, now: new Date(), db: db.isOpen });
 });
 
 app.get("/stats", async (_req, res) => {
