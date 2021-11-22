@@ -1,5 +1,5 @@
 import Binance from "node-binance-api";
-import { find, reduce } from "lodash";
+import { find, reduce, map } from "lodash";
 
 import CONFIG from "./config";
 import { logger } from "./init";
@@ -30,6 +30,27 @@ const getPrice = async (symbol: string): Promise<number> => {
   const ticker = await binance.prices(symbol);
 
   return +(ticker as { [key: string]: number })[symbol]; // + sugar to convert to a number
+};
+
+/**
+ * Returns the current prics for all the symbol in binance
+ *
+ * @returns Number
+ */
+const getAllPrices = async (): Promise<{ [key: string]: number }> => {
+  const ticker = await binance.prices();
+
+  // Just ensure the price is a number
+  return reduce(
+    ticker,
+    (acc, price, market) => {
+      return {
+        ...acc,
+        [market]: +price,
+      };
+    },
+    {}
+  );
 };
 
 /**
@@ -334,6 +355,7 @@ const getBalances = async (): Promise<BalancesResult> => {
 export {
   binance,
   getPrice,
+  getAllPrices,
   getOrder,
   createLimitOrder,
   getTradeInfo,
