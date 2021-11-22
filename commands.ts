@@ -21,4 +21,10 @@ program
   .description("retrieve a purchase")
   .action(actions.purchases.get);
 
+// Balances
+program
+  .command("balances:get")
+  .description("view all the balances")
+  .action(actions.balances.getAll);
+
 program.parse(process.argv);
