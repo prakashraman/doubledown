@@ -40,6 +40,5 @@ const check = async () => {
 };
 
 (() => {
-  // check();
-  collective.run();
+  check();
 })();
