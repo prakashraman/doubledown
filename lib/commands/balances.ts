@@ -1,5 +1,5 @@
 import { table } from "table";
-import { reduce, sortBy } from "lodash";
+import { reduce, sortBy, sumBy } from "lodash";
 
 import { logger } from "../init";
 import { getAllPrices, getBalances } from "../market";
@@ -35,7 +35,11 @@ const getAll = async () => {
     return -item[2]; // ensure the total price is used for sorting
   });
 
-  console.log(table([["Coin", "Amount", "Total (USDT)"], ...data]));
+  const total = sumBy(data, (item) => item[2]);
+
+  console.log(
+    table([["Coin", "Amount", "Total (USDT)"], ...data, ["Total", "-", total]])
+  );
 };
 
 export default { getAll };
