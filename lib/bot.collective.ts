@@ -9,15 +9,23 @@
  * model price for each symbol.
  */
 
-import { map, filter } from "lodash";
+import { map } from "lodash";
 
-import { getAllPrices } from "./market";
+import { createLimitOrder, getAllPrices } from "./market";
 import CONFIG from "./config";
 import { logger } from "./init";
 import { increaseByPercent } from "./utils";
-import { models } from "./bot";
+import { LimitOrderResult } from "./types";
 
 type ModelCollective = string[];
+
+type CollectivePurchaseItem = {
+  symbol: string;
+  price: number;
+  filledQuanity: number;
+  requestedQuantity: number;
+  order: LimitOrderResult;
+};
 
 const model: ModelCollective = [
   "HOTUSDT",
@@ -38,6 +46,11 @@ const run = () => {
   checkForPurchase();
 };
 
+/**
+ * Does all the purchases
+ *
+ * If 4 of 5 symbols are 1 percent below the model price. 5 orders are executed
+ */
 const checkForPurchase = async () => {
   logger.info("bot collective purchase check", { bot: "collective" });
   const prices = await getAllPrices();
@@ -64,16 +77,28 @@ const checkForPurchase = async () => {
   });
 
   const result = await Promise.all(
-    map(symbolsBelowModelPrice, async (symbol) => {
-      const price = prices[symbol];
-      const quantity = POT_AMOUNT / models.length / price;
+    map<string, Promise<CollectivePurchaseItem>>(
+      symbolsBelowModelPrice,
+      async (symbol) => {
+        const price = prices[symbol];
+        const quantity = POT_AMOUNT / model.length / price;
 
-      return {
-        symbol,
-        quantity,
-        price,
-      };
-    })
+        const order = await createLimitOrder({
+          symbol,
+          price,
+          quantity,
+          side: "BUY",
+        });
+
+        return {
+          symbol,
+          requestedQuantity: quantity,
+          price,
+          filledQuanity: order.filledQuantity,
+          order,
+        };
+      }
+    )
   );
 
   console.log({ result });
