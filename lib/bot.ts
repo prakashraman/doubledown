@@ -56,19 +56,19 @@ const models: Model[] = [
 const PURCHASE_LEVELS: PurchaseLevel = {
   single: {
     buyAtDropPercent: 2,
-    usd: 70,
+    usd: 40,
     sellAtJumpPercent: 1.1,
   },
 
   double: {
     buyAtDropPercent: 5,
-    usd: 120,
+    usd: 60,
     sellAtJumpPercent: 2.5,
   },
 
   tripple: {
     buyAtDropPercent: 10,
-    usd: 210,
+    usd: 100,
     sellAtJumpPercent: 5,
   },
 };
