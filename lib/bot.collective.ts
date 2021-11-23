@@ -83,12 +83,21 @@ const checkForPurchase = async () => {
         const price = prices[symbol];
         const quantity = POT_AMOUNT / model.length / price;
 
-        const order = await createLimitOrder({
+        // const order = await createLimitOrder({
+        //   symbol,
+        //   price,
+        //   quantity,
+        //   side: "BUY",
+        // });
+        const order: LimitOrderResult = {
           symbol,
-          price,
-          quantity,
+          filledQuantity: 1000,
           side: "BUY",
-        });
+          orderId: 1,
+          price,
+          quantity: 1100,
+          commission: 100,
+        };
 
         return {
           symbol,

@@ -27,4 +27,14 @@ program
   .description("view all the balances")
   .action(actions.balances.getAll);
 
+// Orders
+
+program
+  .command("orders:order")
+  .requiredOption("-s, --symbol <string>", "symbol")
+  .requiredOption("-u, --usdt <string>", "equivalent usdt to purhcase")
+  .requiredOption("-si, --side <string>", "side [BUY|SELL]")
+  .description("place an order")
+  .action(actions.orders.order);
+
 program.parse(process.argv);
