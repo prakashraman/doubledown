@@ -157,16 +157,15 @@ const checkForSale = async (purhcase: CollectivePurchase) => {
     });
     return total;
   });
-  const total = sum(totals);
 
-  logger.info("total", { total });
+  const total = sum(totals);
 
   if (total >= purhcase.sellAfterTotal) {
     logger.info("collective selling", { model: "collective" });
     try {
       const result = await Promise.all(
-        map(purhcase.items, (purhcase) => {
-          createLimitOrder({
+        map(purhcase.items, async (purhcase) => {
+          return await createLimitOrder({
             symbol: purhcase.symbol,
             price: prices[purhcase.symbol],
             quantity: purhcase.filledQuanity,
