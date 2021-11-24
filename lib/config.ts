@@ -32,6 +32,8 @@ const CONFIG = {
   KEY_MODEL_COLLECTIVE: "model:collective",
 
   MODEL_PRICES,
+
+  BOT_COLLECTIVE_POT: 100,
 };
 
 export default CONFIG;

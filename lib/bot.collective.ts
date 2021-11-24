@@ -18,7 +18,6 @@ import { logger } from "./init";
 import { increaseByPercent } from "./utils";
 import { LimitOrderResult } from "./types";
 import * as db from "./db";
-import { purchases } from "./commands";
 import { hasBalanceForPurchase } from "./bot";
 
 type ModelCollective = string[];
@@ -46,7 +45,7 @@ const model: ModelCollective = [
   "ANKRUSDT",
 ];
 
-const POT_AMOUNT = 500;
+const POT_AMOUNT = CONFIG.BOT_COLLECTIVE_POT;
 
 /**
  * Main "run" operation for collective model
@@ -54,6 +53,7 @@ const POT_AMOUNT = 500;
  * It performs the "purchase" and "sell" checks
  */
 const run = async () => {
+  logger.info("bot:collective run");
   const purchase: CollectivePurchase = await db.getJSON(
     CONFIG.KEY_MODEL_COLLECTIVE
   );
@@ -73,7 +73,7 @@ const run = async () => {
  * If 4 of 5 symbols are 1 percent below the model price. 5 orders are executed
  */
 const checkForPurchase = async () => {
-  logger.info("bot collective purchase check", { bot: "collective" });
+  logger.info("bot:collective purchase check", { bot: "collective" });
   const prices = await getAllPrices();
   const symbolsBelowModelPrice = map(model, (symbol) => {
     const modelPrice = CONFIG.MODEL_PRICES[symbol];
@@ -90,7 +90,13 @@ const checkForPurchase = async () => {
     return price < increaseByPercent(modelPrice, -1) ? symbol : null;
   }).filter((v) => v);
 
-  if (symbolsBelowModelPrice.length < 4) return;
+  if (symbolsBelowModelPrice.length < 4) {
+    logger.info("not ready to purchase", {
+      bot: "collective",
+      symbols: symbolsBelowModelPrice,
+    });
+    return;
+  }
 
   logger.info("ready to purchase", {
     bot: "collective",
@@ -149,16 +155,11 @@ const checkForSale = async (purhcase: CollectivePurchase) => {
   logger.info("check for sale", { model: "collective" });
   const prices = await getAllPrices();
 
-  const totals = map(purhcase.items, (item) => {
-    const total = prices[item.symbol] * item.filledQuanity;
-    logger.info("current", {
-      total,
-      symbol: item.symbol,
-    });
-    return total;
-  });
-
-  const total = sum(totals);
+  const total = sum(
+    map(purhcase.items, (item) => {
+      return prices[item.symbol] * item.filledQuanity;
+    })
+  );
 
   if (total >= purhcase.sellAfterTotal) {
     logger.info("collective selling", { model: "collective" });
@@ -178,6 +179,8 @@ const checkForSale = async (purhcase: CollectivePurchase) => {
     } catch (error) {
       logger.error("unable to collective sell", { error });
     }
+  } else {
+    logger.info("collective not ready to sell", { total });
   }
 };
 
