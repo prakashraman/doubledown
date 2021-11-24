@@ -110,6 +110,7 @@ type TradeResult = {
   commission: number;
   symbol: string;
   time: number;
+  isBuyer: boolean;
 };
 
 export {

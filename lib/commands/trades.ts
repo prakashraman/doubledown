@@ -12,14 +12,25 @@ const get = async (options: OptionValues) => {
     .slice(-latest)
     .map((trade) => [
       trade.orderId,
+      trade.isBuyer ? "BUY" : "SELL",
       trade.price,
       trade.quantity,
+      trade.commission,
       "$ " + (trade.price * trade.quantity).toFixed(2),
       moment(trade.time).format("LLL"),
     ]);
 
+  const columns = [
+    "Order ID",
+    "Side",
+    "Price",
+    "Quantity",
+    "Commission",
+    "Total (USD)",
+    "Time",
+  ];
   console.log(
-    table(data, {
+    table([columns, ...data], {
       header: {
         content: `${symbol} Trades`,
         alignment: "center",
