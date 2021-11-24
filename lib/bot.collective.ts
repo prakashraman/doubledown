@@ -9,7 +9,7 @@
  * model price for each symbol.
  */
 
-import { map, chain, sum } from "lodash";
+import { map, sum } from "lodash";
 import moment from "moment";
 
 import { createLimitOrder, getAllPrices } from "./market";
@@ -18,7 +18,6 @@ import { logger } from "./init";
 import { increaseByPercent } from "./utils";
 import { LimitOrderResult } from "./types";
 import * as db from "./db";
-import { isGeneratorFunction } from "util/types";
 import { purchases } from "./commands";
 import { hasBalanceForPurchase } from "./bot";
 
@@ -47,7 +46,7 @@ const model: ModelCollective = [
   "ANKRUSDT",
 ];
 
-const POT_AMOUNT = 1000;
+const POT_AMOUNT = 500;
 
 /**
  * Main "run" operation for collective model
@@ -112,21 +111,12 @@ const checkForPurchase = async () => {
         const price = prices[symbol];
         const quantity = POT_AMOUNT / model.length / price;
 
-        // const order = await createLimitOrder({
-        //   symbol,
-        //   price,
-        //   quantity,
-        //   side: "BUY",
-        // });
-        const order: LimitOrderResult = {
+        const order = await createLimitOrder({
           symbol,
-          filledQuantity: 1000,
-          side: "BUY",
-          orderId: 1,
           price,
-          quantity: 1100,
-          commission: 100,
-        };
+          quantity,
+          side: "BUY",
+        });
 
         return {
           symbol,
