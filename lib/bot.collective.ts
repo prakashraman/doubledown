@@ -37,6 +37,16 @@ type CollectivePurchase = {
   items: CollectivePurchaseItem[];
 };
 
+type CollectivePurchaseStats = {
+  sellAfterTotal: number;
+  currentTotal: number;
+  items: {
+    symbol: string;
+    item: CollectivePurchaseItem;
+    profit: number;
+  }[];
+};
+
 const model: ModelCollective = [
   "HOTUSDT",
   "SOLUSDT",
@@ -54,9 +64,7 @@ const POT_AMOUNT = CONFIG.BOT_COLLECTIVE_POT;
  */
 const run = async () => {
   logger.info("bot:collective run");
-  const purchase: CollectivePurchase = await db.getJSON(
-    CONFIG.KEY_MODEL_COLLECTIVE
-  );
+  const purchase = await getCollectivePurchase();
 
   // If there is a purchase in the database, it attempts to sell if off
   // else ofcourse attempt to purchase
@@ -151,21 +159,20 @@ const checkForPurchase = async () => {
  * All the purchases are sold off at that instant regardless if individually
  * there are in profit or not. The idea is that collectively we'd need to be profit
  */
-const checkForSale = async (purhcase: CollectivePurchase) => {
-  logger.info("check for sale", { model: "collective" });
+const checkForSale = async (purchase: CollectivePurchase) => {
   const prices = await getAllPrices();
 
   const total = sum(
-    map(purhcase.items, (item) => {
+    map(purchase.items, (item) => {
       return prices[item.symbol] * item.filledQuanity;
     })
   );
 
-  if (total >= purhcase.sellAfterTotal) {
+  if (total >= purchase.sellAfterTotal) {
     logger.info("collective selling", { model: "collective" });
     try {
       const result = await Promise.all(
-        map(purhcase.items, async (purhcase) => {
+        map(purchase.items, async (purhcase) => {
           return await createLimitOrder({
             symbol: purhcase.symbol,
             price: prices[purhcase.symbol],
@@ -184,4 +191,48 @@ const checkForSale = async (purhcase: CollectivePurchase) => {
   }
 };
 
+/**
+ * Determines if there is an active purchase.
+ *
+ * It just looks for the presense of the "key"
+ *
+ * @returns Promise<boolean>
+ */
+const getCollectivePurchase = async (): Promise<null | CollectivePurchase> => {
+  return (await db.getJSON(CONFIG.KEY_MODEL_COLLECTIVE)) as CollectivePurchase;
+};
+
+/**
+ * Constructs a usable structure to decipher the current status of the collective purchase
+ *
+ * @returns Promise
+ */
+const getStats = async (): Promise<CollectivePurchaseStats> => {
+  const purchase = await getCollectivePurchase();
+  const prices = await getAllPrices();
+  const items = map(purchase.items, (item) => {
+    return {
+      symbol: item.symbol,
+      profit: +(
+        (prices[item.symbol] - item.price) *
+        item.filledQuanity
+      ).toFixed(4),
+      item,
+    };
+  });
+
+  const currentTotal = +sum(
+    map(purchase.items, (item) => {
+      return prices[item.symbol] * item.filledQuanity;
+    })
+  ).toFixed(2);
+
+  return {
+    sellAfterTotal: purchase.sellAfterTotal,
+    currentTotal: currentTotal,
+    items,
+  };
+};
+
 export default { run };
+export { getCollectivePurchase, getStats };

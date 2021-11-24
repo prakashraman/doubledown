@@ -48,4 +48,10 @@ program
   .description("fetch trades for symbol")
   .action(actions.trades.get);
 
+// bot:collective
+program
+  .command("bot:collective:stats")
+  .description("bot collective stats")
+  .action(actions.botCollective.stats);
+
 program.parse(process.argv);
