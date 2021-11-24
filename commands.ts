@@ -40,6 +40,7 @@ program
 program
   .command("trades:get")
   .requiredOption("-s, --symbol <string>", "symbol")
+  .option("-l, --latest <int>", "number of latest trades to be displayed", "10")
   .description("fetch trades for symbol")
   .action(actions.trades.get);
 
