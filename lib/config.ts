@@ -33,7 +33,7 @@ const CONFIG = {
 
   MODEL_PRICES,
 
-  BOT_COLLECTIVE_POT: 100,
+  BOT_COLLECTIVE_POT: 300,
 };
 
 export default CONFIG;
