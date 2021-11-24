@@ -1,4 +1,5 @@
 import { table } from "table";
+import moment from "moment";
 
 import { logger } from "../init";
 import { removePurchase, getPurchases } from "../bot";
@@ -10,9 +11,16 @@ import { PurchaseInPlay } from "../types";
  * In a table
  */
 const list = async () => {
-  const data = (await getPurchases()).map((p) => [p.id, p.symbol]);
+  const data = (await getPurchases()).map((p) => [
+    p.id,
+    p.symbol,
+    p.level,
+    moment(p.time).format("LLL"),
+  ]);
   console.log(
-    table(data, { header: { content: "Purchases", alignment: "center" } })
+    table([["Order ID", "Symbol", "Level", "Time"], ...data], {
+      header: { content: "Purchases", alignment: "center" },
+    })
   );
 };
 
