@@ -2,7 +2,8 @@ import { map, sortBy } from "lodash";
 
 import { getPriceFromDb } from "../market";
 import { models, getNextPurchaseLevel, getPriceAtLevel } from "../bot";
-import { Level, PurchaseInPlay } from "../types";
+import { Level, PurchaseInPlay, CollectivePurchaseStats } from "../types";
+import { getStats } from "../bot.collective";
 
 /* ------------------------ TYPES -------------------- */
 
@@ -62,4 +63,13 @@ const serializePurchases = (purchases: PurchaseInPlay[]): Purchase[] => {
   }));
 };
 
-export { prices, serializePurchases };
+/**
+ * Fetch the collective stats
+ *
+ * @returns Promise
+ */
+const collectiveStats = async (): Promise<CollectivePurchaseStats> => {
+  return await getStats();
+};
+
+export { prices, serializePurchases, collectiveStats };

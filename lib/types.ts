@@ -83,6 +83,35 @@ type LimitOrderResult = {
   filledQuantity: number;
 };
 
+/* ---------- COLLECTIVE BOT -------------- */
+
+type ModelCollective = string[];
+
+type CollectivePurchaseItem = {
+  symbol: string;
+  price: number;
+  filledQuanity: number;
+  requestedQuantity: number;
+  order: LimitOrderResult;
+};
+
+type CollectivePurchase = {
+  pot: number;
+  sellAfterTotal: number;
+  time: string;
+  items: CollectivePurchaseItem[];
+};
+
+type CollectivePurchaseStats = {
+  sellAfterTotal: number;
+  currentTotal: number;
+  items: {
+    symbol: string;
+    item: CollectivePurchaseItem;
+    profit: number;
+  }[];
+};
+
 /* --------------- BINANCE TYPES ------------- */
 
 type OrderSide = "BUY" | "SELL";
@@ -125,4 +154,8 @@ export {
   BalancesResponse,
   BalancesResult,
   TradeResult,
+  CollectivePurchaseStats,
+  CollectivePurchase,
+  CollectivePurchaseItem,
+  ModelCollective,
 };

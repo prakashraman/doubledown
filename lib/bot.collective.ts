@@ -16,36 +16,16 @@ import { createLimitOrder, getAllPrices } from "./market";
 import CONFIG from "./config";
 import { logger } from "./init";
 import { increaseByPercent } from "./utils";
-import { LimitOrderResult } from "./types";
+import {
+  CollectivePurchase,
+  CollectivePurchaseStats,
+  ModelCollective,
+  CollectivePurchaseItem,
+} from "./types";
 import * as db from "./db";
 import { hasBalanceForPurchase } from "./bot";
 
-type ModelCollective = string[];
-
-type CollectivePurchaseItem = {
-  symbol: string;
-  price: number;
-  filledQuanity: number;
-  requestedQuantity: number;
-  order: LimitOrderResult;
-};
-
-type CollectivePurchase = {
-  pot: number;
-  sellAfterTotal: number;
-  time: string;
-  items: CollectivePurchaseItem[];
-};
-
-type CollectivePurchaseStats = {
-  sellAfterTotal: number;
-  currentTotal: number;
-  items: {
-    symbol: string;
-    item: CollectivePurchaseItem;
-    profit: number;
-  }[];
-};
+const POT_AMOUNT = CONFIG.BOT_COLLECTIVE_POT;
 
 const model: ModelCollective = [
   "HOTUSDT",
@@ -54,8 +34,6 @@ const model: ModelCollective = [
   "ETHUSDT",
   "ANKRUSDT",
 ];
-
-const POT_AMOUNT = CONFIG.BOT_COLLECTIVE_POT;
 
 /**
  * Main "run" operation for collective model
@@ -81,7 +59,6 @@ const run = async () => {
  * If 4 of 5 symbols are 1 percent below the model price. 5 orders are executed
  */
 const checkForPurchase = async () => {
-  logger.info("bot:collective purchase check", { bot: "collective" });
   const prices = await getAllPrices();
   const symbolsBelowModelPrice = map(model, (symbol) => {
     const modelPrice = CONFIG.MODEL_PRICES[symbol];

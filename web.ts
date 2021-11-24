@@ -10,7 +10,7 @@ import * as path from "path";
 import express from "express";
 
 import { logger } from "./lib/init";
-import { prices, serializePurchases } from "./lib/web/model";
+import { prices, serializePurchases, collectiveStats } from "./lib/web/model";
 import { getPurchases } from "./lib/bot";
 import { getClient } from "./lib/db";
 
@@ -41,6 +41,7 @@ app.get("/stats", async (_req, res) => {
   res.render("stats", {
     prices: await prices(),
     purchases: serializePurchases(await getPurchases()),
+    collectiveStats: await collectiveStats(),
   });
 });
 

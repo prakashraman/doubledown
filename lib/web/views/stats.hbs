@@ -15,6 +15,26 @@
     </style>
   </head>
   <body>
+
+    {{#if collectiveStats }}
+      <table>
+        <caption>Collective Stats</caption>
+        <thead>
+        <tr>
+          <th>Sell After</th>
+          <th>Current</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-label="Sell After">{{ collectiveStats.sellAfterTotal }}</td>
+          <td data-label="Current">{{ collectiveStats.currentTotal }}</td>
+        </tr>
+      </tbody>
+      </table>
+      <hr>
+    {{/if}}
+
     <table>
       <thead>
         <tr>
