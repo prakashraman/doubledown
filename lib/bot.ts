@@ -361,4 +361,5 @@ export {
   getNextPurchaseLevel,
   getPriceAtLevel,
   hasBalanceForPurchase,
+  removePurchase,
 };

@@ -1,12 +1,25 @@
+import { table } from "table";
+
 import { logger } from "../init";
+import { removePurchase, getPurchases } from "../bot";
+import { PurchaseInPlay } from "../types";
 
 /**
- * Prints the purhcase
+ * Prints all the purhcases
  *
- * @param {string} id
+ * In a table
  */
-const get = (id: string) => {
-  logger.info("printing", { id });
+const list = async () => {
+  const data = (await getPurchases()).map((p) => [p.id, p.symbol]);
+  console.log(
+    table(data, { header: { content: "Purchases", alignment: "center" } })
+  );
 };
 
-export default { get };
+const remove = async (id: string) => {
+  logger.info("remove purhcase", { id });
+  const purhcase = { id: id } as PurchaseInPlay;
+  await removePurchase(purhcase);
+};
+
+export default { list, remove };

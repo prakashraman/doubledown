@@ -15,11 +15,15 @@ const program = new Command();
 
 const CMD_PURCHASE = "purchases";
 program.command(`${CMD_PURCHASE}`).description("manage purchases");
-program.command(`${CMD_PURCHASE}:list`).description("list all the purchases");
 program
-  .command(`${CMD_PURCHASE}:get <id>`)
-  .description("retrieve a purchase")
-  .action(actions.purchases.get);
+  .command(`${CMD_PURCHASE}:list`)
+  .description("list all the purchases")
+  .action(actions.purchases.list);
+program
+  .command(`${CMD_PURCHASE}:remove <id>`)
+  .option("-a, --another", "another id")
+  .description("remove a purhcase")
+  .action(actions.purchases.remove);
 
 // Balances
 program
