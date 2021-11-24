@@ -9,13 +9,17 @@
  * model price for each symbol.
  */
 
-import { map } from "lodash";
+import { map, chain, sum } from "lodash";
+import moment from "moment";
 
 import { createLimitOrder, getAllPrices } from "./market";
 import CONFIG from "./config";
 import { logger } from "./init";
 import { increaseByPercent } from "./utils";
 import { LimitOrderResult } from "./types";
+import * as db from "./db";
+import { isGeneratorFunction } from "util/types";
+import { purchases } from "./commands";
 
 type ModelCollective = string[];
 
@@ -25,6 +29,13 @@ type CollectivePurchaseItem = {
   filledQuanity: number;
   requestedQuantity: number;
   order: LimitOrderResult;
+};
+
+type CollectivePurchase = {
+  pot: number;
+  sellAfterTotal: number;
+  time: string;
+  items: CollectivePurchaseItem[];
 };
 
 const model: ModelCollective = [
@@ -42,8 +53,18 @@ const POT_AMOUNT = 1000;
  *
  * It performs the "purchase" and "sell" checks
  */
-const run = () => {
-  checkForPurchase();
+const run = async () => {
+  const purchase: CollectivePurchase = await db.getJSON(
+    CONFIG.KEY_MODEL_COLLECTIVE
+  );
+
+  // If there is a purchase in the database, it attempts to sell if off
+  // else ofcourse attempt to purchase
+  if (purchase) {
+    checkForSale(purchase);
+  } else {
+    checkForPurchase();
+  }
 };
 
 /**
@@ -110,7 +131,57 @@ const checkForPurchase = async () => {
     )
   );
 
-  console.log({ result });
+  const purchase: CollectivePurchase = {
+    pot: POT_AMOUNT,
+    sellAfterTotal: increaseByPercent(POT_AMOUNT, 2),
+    time: moment().format(),
+    items: result,
+  };
+
+  await db.setJSON(CONFIG.KEY_MODEL_COLLECTIVE, purchase);
+};
+
+/**
+ * The method checks is the collective total are more than the "sellAfterTotal".
+ *
+ * All the purchases are sold off at that instant regardless if individually
+ * there are in profit or not. The idea is that collectively we'd need to be profit
+ */
+const checkForSale = async (purhcase: CollectivePurchase) => {
+  logger.info("check for sale", { model: "collective" });
+  const prices = await getAllPrices();
+
+  const totals = map(purhcase.items, (item) => {
+    const total = prices[item.symbol] * item.filledQuanity;
+    logger.info("current", {
+      total,
+      symbol: item.symbol,
+    });
+    return total;
+  });
+  const total = sum(totals);
+
+  logger.info("total", { total });
+
+  if (total >= purhcase.sellAfterTotal) {
+    logger.info("collective selling", { model: "collective" });
+    try {
+      const result = await Promise.all(
+        map(purhcase.items, (purhcase) => {
+          createLimitOrder({
+            symbol: purhcase.symbol,
+            price: prices[purhcase.symbol],
+            quantity: purhcase.filledQuanity,
+            side: "SELL",
+          });
+        })
+      );
+
+      (await db.getClient()).DEL(CONFIG.KEY_MODEL_COLLECTIVE);
+    } catch (error) {
+      logger.error("unable to collective sell", { error });
+    }
+  }
 };
 
 export default { run };
