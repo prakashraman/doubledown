@@ -25,10 +25,6 @@ const { MODEL_PRICES } = CONFIG;
 
 const models: Model[] = [
   {
-    symbol: "HOTBUSD",
-    price: MODEL_PRICES.HOTBUSD,
-  },
-  {
     symbol: "DOTUSDT",
     price: MODEL_PRICES.DOTUSDT,
   },
@@ -43,10 +39,6 @@ const models: Model[] = [
   {
     symbol: "CHRUSDT",
     price: MODEL_PRICES.CHRUSDT,
-  },
-  {
-    symbol: "MATICUSDT",
-    price: MODEL_PRICES.MATICUSDT,
   },
 ];
 
