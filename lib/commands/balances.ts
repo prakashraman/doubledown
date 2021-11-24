@@ -35,7 +35,7 @@ const getAll = async () => {
     return -item[2]; // ensure the total price is used for sorting
   });
 
-  const total = sumBy(data, (item) => item[2]);
+  const total = sumBy(data, (item) => item[2]).toFixed(2);
 
   console.log(
     table([["Coin", "Amount", "Total (USDT)"], ...data, ["Total", "-", total]])

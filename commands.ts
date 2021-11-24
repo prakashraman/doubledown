@@ -28,7 +28,6 @@ program
   .action(actions.balances.getAll);
 
 // Orders
-
 program
   .command("orders:order")
   .requiredOption("-s, --symbol <string>", "symbol")
@@ -36,5 +35,12 @@ program
   .requiredOption("-si, --side <string>", "side [BUY|SELL]")
   .description("place an order")
   .action(actions.orders.order);
+
+// trades
+program
+  .command("trades:get")
+  .requiredOption("-s, --symbol <string>", "symbol")
+  .description("fetch trades for symbol")
+  .action(actions.trades.get);
 
 program.parse(process.argv);

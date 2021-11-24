@@ -103,6 +103,15 @@ type BalancesResult = {
   [key: string]: number;
 };
 
+type TradeResult = {
+  orderId: string;
+  price: number;
+  quantity: number;
+  commission: number;
+  symbol: string;
+  time: number;
+};
+
 export {
   PurchaseInPlay,
   Purchase,
@@ -114,4 +123,5 @@ export {
   LimitOrderResult,
   BalancesResponse,
   BalancesResult,
+  TradeResult,
 };

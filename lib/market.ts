@@ -9,6 +9,7 @@ import {
   LimitOrderResult,
   BalancesResponse,
   BalancesResult,
+  TradeResult,
 } from "./types";
 import * as db from "./db";
 import { increaseByPercent } from "./utils";
@@ -286,6 +287,35 @@ const getTradeInfo = (
   });
 };
 
+/**
+ * Return all the trades for a symbol from binance
+ *
+ * @param {string} symbol
+ * @returns Promise<TradeResult[]>
+ */
+const getTrades = async (symbol: string): Promise<TradeResult[]> => {
+  return new Promise<TradeResult[]>((resolve, reject) => {
+    binance.trades(symbol, (error, info: any[]) => {
+      if (error) {
+        logger.error("trade fetch error", { symbol });
+      } else {
+        resolve(
+          info.map((trade) => {
+            return {
+              symbol,
+              orderId: trade.orderId,
+              price: +trade.price,
+              quantity: +trade.qty,
+              commission: +trade.commission,
+              time: trade.time,
+            };
+          })
+        );
+      }
+    });
+  });
+};
+
 type AdjustSymbolPriceAndQuantityProps = {
   symbol: string;
   price: number;
@@ -359,6 +389,7 @@ export {
   getOrder,
   createLimitOrder,
   getTradeInfo,
+  getTrades,
   isLocked,
   getPriceFromDb,
   getBalances,
