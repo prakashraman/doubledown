@@ -354,4 +354,11 @@ const hasBalanceForPurchase = async (
   return (await getBalance(currency)) > increaseByPercent(total, 5);
 };
 
-export { run, models, getPurchases, getNextPurchaseLevel, getPriceAtLevel };
+export {
+  run,
+  models,
+  getPurchases,
+  getNextPurchaseLevel,
+  getPriceAtLevel,
+  hasBalanceForPurchase,
+};

@@ -20,6 +20,7 @@ import { LimitOrderResult } from "./types";
 import * as db from "./db";
 import { isGeneratorFunction } from "util/types";
 import { purchases } from "./commands";
+import { hasBalanceForPurchase } from "./bot";
 
 type ModelCollective = string[];
 
@@ -96,6 +97,13 @@ const checkForPurchase = async () => {
     bot: "collective",
     symbols: symbolsBelowModelPrice,
   });
+
+  if (!(await hasBalanceForPurchase("USDT", POT_AMOUNT))) {
+    logger.info("insufficient balanace for collective purchase", {
+      pot: POT_AMOUNT,
+    });
+    return;
+  }
 
   const result = await Promise.all(
     map<string, Promise<CollectivePurchaseItem>>(
