@@ -96,28 +96,25 @@ const checkForPurchase = async () => {
   }
 
   const result = await Promise.all(
-    map<string, Promise<CollectivePurchaseItem>>(
-      symbolsBelowModelPrice,
-      async (symbol) => {
-        const price = prices[symbol];
-        const quantity = POT_AMOUNT / model.length / price;
+    map<string, Promise<CollectivePurchaseItem>>(model, async (symbol) => {
+      const price = prices[symbol];
+      const quantity = POT_AMOUNT / model.length / price;
 
-        const order = await createLimitOrder({
-          symbol,
-          price,
-          quantity,
-          side: "BUY",
-        });
+      const order = await createLimitOrder({
+        symbol,
+        price,
+        quantity,
+        side: "BUY",
+      });
 
-        return {
-          symbol,
-          requestedQuantity: quantity,
-          price,
-          filledQuanity: order.filledQuantity,
-          order,
-        };
-      }
-    )
+      return {
+        symbol,
+        requestedQuantity: quantity,
+        price,
+        filledQuanity: order.filledQuantity,
+        order,
+      };
+    })
   );
 
   const purchase: CollectivePurchase = {
