@@ -1,7 +1,7 @@
 import { filter, map } from "lodash";
 
 import { logger } from "./init";
-import { getPrice } from "./market";
+import { getAllPrices, getPrice } from "./market";
 import * as db from "./db";
 import { createLimitOrder, isLocked } from "./market";
 import {
@@ -82,7 +82,9 @@ const getPurchaseLevelMeta = (level: Level): PurchaseLevelMeta => {
  * - Checks if the currency should be bought/sold
  */
 const run = async () => {
-  logger.info("run");
+  logger.info("bot:doubledown run");
+
+  const prices = await getAllPrices();
 
   await Promise.all(
     map(models, async (model) => {
@@ -93,7 +95,7 @@ const run = async () => {
         return;
       }
 
-      const price = await getPrice(model.symbol);
+      const price = prices[model.symbol];
 
       await db.set(`price:${symbol}`, `${price}`);
       await checkForPurchase(model, price);
