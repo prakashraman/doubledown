@@ -72,7 +72,7 @@ const checkForPurchase = async () => {
       throw new Error(`symbol price not defined for ${symbol}`);
     }
 
-    return price < increaseByPercent(modelPrice, -1) ? symbol : null;
+    return price < increaseByPercent(modelPrice, -1.5) ? symbol : null;
   }).filter((v) => v);
 
   if (symbolsBelowModelPrice.length < 4) {
