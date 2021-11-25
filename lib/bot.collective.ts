@@ -183,6 +183,9 @@ const getCollectivePurchase = async (): Promise<null | CollectivePurchase> => {
  */
 const getStats = async (): Promise<CollectivePurchaseStats> => {
   const purchase = await getCollectivePurchase();
+
+  if (!purchase) return null;
+
   const prices = await getAllPrices();
   const items = map(purchase.items, (item) => {
     return {
