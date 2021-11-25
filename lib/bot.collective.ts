@@ -75,7 +75,7 @@ const checkForPurchase = async () => {
     return price < increaseByPercent(modelPrice, -1.5) ? symbol : null;
   }).filter((v) => v);
 
-  if (symbolsBelowModelPrice.length < 4) {
+  if (symbolsBelowModelPrice.length < 3) {
     logger.info("not ready to purchase", {
       bot: "collective",
       symbols: symbolsBelowModelPrice,
