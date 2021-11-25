@@ -30,6 +30,12 @@
           <td data-label="Sell After">{{ collectiveStats.sellAfterTotal }}</td>
           <td data-label="Current">{{ collectiveStats.currentTotal }}</td>
         </tr>
+          {{#each collectiveStats.items }}
+            <tr>
+              <td data-label="{{ this.symbol }}">{{ this.symbol }}</td>
+              <td data-label="Profit">{{ this.profit }}</td>
+            </tr>
+          {{/each}}
       </tbody>
       </table>
       <hr>
