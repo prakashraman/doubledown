@@ -119,7 +119,7 @@ const checkForPurchase = async () => {
 
   const purchase: CollectivePurchase = {
     pot: POT_AMOUNT,
-    sellAfterTotal: increaseByPercent(POT_AMOUNT, 0.5),
+    sellAfterTotal: increaseByPercent(POT_AMOUNT, 1),
     time: moment().format(),
     items: result,
   };
