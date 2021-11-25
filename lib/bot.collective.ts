@@ -72,7 +72,7 @@ const checkForPurchase = async () => {
       throw new Error(`symbol price not defined for ${symbol}`);
     }
 
-    return price < increaseByPercent(modelPrice, -1.5) ? symbol : null;
+    return price < increaseByPercent(modelPrice, -3) ? symbol : null;
   }).filter((v) => v);
 
   if (symbolsBelowModelPrice.length < 3) {
@@ -119,11 +119,20 @@ const checkForPurchase = async () => {
 
   const purchase: CollectivePurchase = {
     pot: POT_AMOUNT,
-    sellAfterTotal: increaseByPercent(POT_AMOUNT, 1),
+    sellAfterTotal: increaseByPercent(POT_AMOUNT, 1.5),
     time: moment().format(),
     items: result,
   };
 
+  await setPurchase(purchase);
+};
+
+/**
+ * Update's the purchase in the database
+ *
+ * @param {CollectivePurchase} purchase
+ */
+const setPurchase = async (purchase: CollectivePurchase) => {
   await db.setJSON(CONFIG.KEY_MODEL_COLLECTIVE, purchase);
 };
 
@@ -212,4 +221,4 @@ const getStats = async (): Promise<CollectivePurchaseStats> => {
 };
 
 export default { run };
-export { getCollectivePurchase, getStats };
+export { getCollectivePurchase, getStats, setPurchase };

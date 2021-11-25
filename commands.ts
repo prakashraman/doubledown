@@ -53,5 +53,10 @@ program
   .command("bot:collective:stats")
   .description("bot collective stats")
   .action(actions.botCollective.stats);
+program
+  .command("bot:collective:set_sell_price")
+  .argument("<price>", "price to be set", parseFloat)
+  .description("set's the collective purchase sell price")
+  .action(actions.botCollective.setSellPrice);
 
 program.parse(process.argv);
