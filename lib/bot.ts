@@ -1,4 +1,4 @@
-import { filter, map } from "lodash";
+import { filter, map, difference } from "lodash";
 
 import { logger } from "./init";
 import { getAllPrices, getPrice } from "./market";
@@ -195,18 +195,15 @@ const getNextPurchaseLevel = async (symbol: string): Promise<Level | null> => {
   // If none are present it would imply that none are purchased yet.
   if (activeLevels.length === 0) return Level.Single;
 
-  /**
-   * Basically checks if
-   *
-   * - Single then double
-   * - Double then tripple
-   * - Tripper then null
-   */
-  if (activeLevels.includes(Level.Tripple)) return null;
-  else if (activeLevels.includes(Level.Double)) return Level.Tripple;
-  else if (activeLevels.includes(Level.Single)) return Level.Double;
+  const diff = difference(
+    [Level.Single, Level.Double, Level.Tripple],
+    activeLevels
+  );
 
-  return Level.Single;
+  // Infers that all possible purchases are made.
+  if (diff.length === 0) return null;
+
+  return diff[0];
 };
 
 /**
