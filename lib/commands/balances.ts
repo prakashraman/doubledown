@@ -16,7 +16,7 @@ const getAll = async () => {
   let data = reduce(
     await getBalances(),
     (acc, balance, coin) => {
-      const usdtPrice = prices[`${coin}USDT`];
+      let usdtPrice = prices[`${coin}USDT`];
       let total = 0;
 
       if (coin === "USDT") total = +balance.toFixed(2);
@@ -26,19 +26,26 @@ const getAll = async () => {
 
       if (total < 1) return [...acc]; // skip if less than $1
 
-      return [...acc, [coin, balance, total]];
+      return [
+        ...acc,
+        [coin, balance, usdtPrice ? usdtPrice.toFixed(4) : "-", total],
+      ];
     },
     []
   );
 
   data = sortBy(data, (item) => {
-    return -item[2]; // ensure the total price is used for sorting
+    return -item[3]; // ensure the total price is used for sorting
   });
 
-  const total = sumBy(data, (item) => item[2]).toFixed(2);
+  const total = sumBy(data, (item) => item[3]).toFixed(2);
 
   console.log(
-    table([["Coin", "Amount", "Total (USDT)"], ...data, ["Total", "-", total]])
+    table([
+      ["Coin", "Amount", "Price", "Total (USDT)"],
+      ...data,
+      ["Total", "-", "-", total],
+    ])
   );
 };
 

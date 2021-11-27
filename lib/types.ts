@@ -137,6 +137,7 @@ type TradeResult = {
   price: number;
   quantity: number;
   commission: number;
+  commissionAsset: string;
   symbol: string;
   time: number;
   isBuyer: boolean;

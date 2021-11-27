@@ -15,7 +15,7 @@ const get = async (options: OptionValues) => {
       trade.isBuyer ? "BUY" : "SELL",
       trade.price,
       trade.quantity,
-      trade.commission,
+      `${trade.commission} (${trade.commissionAsset})`,
       "$ " + (trade.price * trade.quantity).toFixed(2),
       moment(trade.time).format("LLL"),
     ]);

@@ -307,6 +307,7 @@ const getTrades = async (symbol: string): Promise<TradeResult[]> => {
               price: +trade.price,
               quantity: +trade.qty,
               commission: +trade.commission,
+              commissionAsset: trade.commissionAsset,
               time: trade.time,
               isBuyer: trade.isBuyer,
             };
