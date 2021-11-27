@@ -16,7 +16,7 @@ const getAll = async () => {
   let data = reduce(
     await getBalances(),
     (acc, balance, coin) => {
-      let usdtPrice = prices[`${coin}USDT`];
+      const usdtPrice = prices[`${coin}USDT`];
       let total = 0;
 
       if (coin === "USDT") total = +balance.toFixed(2);
