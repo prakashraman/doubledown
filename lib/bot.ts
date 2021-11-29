@@ -342,7 +342,7 @@ const hasBalanceForPurchase = async (
 ): Promise<boolean> => {
   const currency = symbol.includes("USDT") ? "USDT" : "BUSD";
 
-  return (await getBalance(currency)) > increaseByPercent(total, 5);
+  return (await getBalance(currency)) > increaseByPercent(total, 2);
 };
 
 export {
