@@ -8,11 +8,11 @@ type TrackedSymbols =
   | "MATICUSDT";
 
 const MODEL_PRICES: Record<TrackedSymbols, number> = {
-  ANKRUSDT: 0.2,
+  ANKRUSDT: 0.167,
   HOTUSDT: 0.0138,
-  DOTUSDT: 40.06,
-  SOLUSDT: 220.0,
-  ETHUSDT: 4519.0,
+  DOTUSDT: 38.06,
+  SOLUSDT: 211.0,
+  ETHUSDT: 4376.0,
   CHRUSDT: 1.24,
   MATICUSDT: 1.73,
 };
