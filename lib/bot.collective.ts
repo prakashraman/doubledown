@@ -32,7 +32,7 @@ const model: ModelCollective = [
   "SOLUSDT",
   "CHRUSDT",
   "ETHUSDT",
-  "ANKRUSDT",
+  "FILUSDT",
 ];
 
 /**
