@@ -10,7 +10,7 @@ type TrackedSymbols =
 
 const MODEL_PRICES: Record<TrackedSymbols, number> = {
   ANKRUSDT: 0.167,
-  HOTUSDT: 0.0126,
+  HOTUSDT: 0.0127,
   DOTUSDT: 38.06,
   SOLUSDT: 211.0,
   ETHUSDT: 4517.0,
