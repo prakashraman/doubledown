@@ -30,7 +30,7 @@ const POT_AMOUNT = CONFIG.BOT_COLLECTIVE_POT;
 const model: ModelCollective = [
   "HOTUSDT",
   "SOLUSDT",
-  "CHRUSDT",
+  "BTCUSDT",
   "ETHUSDT",
   "FILUSDT",
 ];

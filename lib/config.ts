@@ -1,6 +1,6 @@
 type TrackedSymbols =
-  | "ANKRUSDT"
   | "HOTUSDT"
+  | "BTCUSDT"
   | "DOTUSDT"
   | "SOLUSDT"
   | "ETHUSDT"
@@ -9,11 +9,11 @@ type TrackedSymbols =
   | "FILUSDT";
 
 const MODEL_PRICES: Record<TrackedSymbols, number> = {
-  ANKRUSDT: 0.167,
-  HOTUSDT: 0.0126,
+  BTCUSDT: 59219,
+  HOTUSDT: 0.0127,
   DOTUSDT: 38.06,
-  SOLUSDT: 211.0,
-  ETHUSDT: 4517.0,
+  SOLUSDT: 218.0,
+  ETHUSDT: 4689.0,
   CHRUSDT: 1.17,
   MATICUSDT: 1.73,
   FILUSDT: 56.2,
