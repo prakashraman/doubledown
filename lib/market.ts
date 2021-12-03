@@ -156,6 +156,10 @@ const createLimitOrder = async ({
 
             if (orderStatus.status === "FILLED") {
               const tradeInfo = await getTradeInfo(symbol, orderId);
+              const filledQuantity =
+                tradeInfo.commissionAsset === "BNB"
+                  ? adjusted.quantity
+                  : adjusted.quantity - tradeInfo.commission;
               const args = {
                 symbol,
                 price,
@@ -163,7 +167,7 @@ const createLimitOrder = async ({
                 side,
                 orderId,
                 commission: tradeInfo.commission,
-                filledQuantity: adjusted.quantity - tradeInfo.commission,
+                filledQuantity,
               };
 
               logger.info("order filled", { ...args });
@@ -252,6 +256,7 @@ type TradeInfoResult = {
   symbol: string;
   orderId: number;
   commission: number;
+  commissionAsset: string;
 };
 
 /**
@@ -279,7 +284,12 @@ const getTradeInfo = (
             reject(new Error("trade not found"));
             return;
           }
-          resolve({ symbol, orderId, commission: +trade.commission * 1.05 });
+          resolve({
+            symbol,
+            orderId,
+            commission: +trade.commission,
+            commissionAsset: trade.commissionAsset,
+          });
         }
       },
       { orderId }
