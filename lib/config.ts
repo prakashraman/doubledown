@@ -9,14 +9,14 @@ type TrackedSymbols =
   | "FILUSDT";
 
 const MODEL_PRICES: Record<TrackedSymbols, number> = {
-  BTCUSDT: 59219,
-  HOTUSDT: 0.0127,
-  DOTUSDT: 38.06,
-  SOLUSDT: 222.0,
-  ETHUSDT: 4800.0,
-  CHRUSDT: 1.17,
+  BTCUSDT: 57200,
+  HOTUSDT: 0.01219,
+  DOTUSDT: 36.59,
+  SOLUSDT: 234.0,
+  ETHUSDT: 4600.0,
+  CHRUSDT: 0.889,
   MATICUSDT: 1.73,
-  FILUSDT: 56.2,
+  FILUSDT: 53.16,
 };
 
 const CONFIG = {
