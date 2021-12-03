@@ -13,7 +13,7 @@ const MODEL_PRICES: Record<TrackedSymbols, number> = {
   HOTUSDT: 0.0127,
   DOTUSDT: 38.06,
   SOLUSDT: 222.0,
-  ETHUSDT: 4689.0,
+  ETHUSDT: 4800.0,
   CHRUSDT: 1.17,
   MATICUSDT: 1.73,
   FILUSDT: 56.2,
