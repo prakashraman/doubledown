@@ -12,7 +12,7 @@ const MODEL_PRICES: Record<TrackedSymbols, number> = {
   BTCUSDT: 57200,
   HOTUSDT: 0.01219,
   DOTUSDT: 36.59,
-  SOLUSDT: 250.0,
+  SOLUSDT: 234.0,
   ETHUSDT: 4600.0,
   CHRUSDT: 0.889,
   MATICUSDT: 1.73,
