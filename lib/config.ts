@@ -30,6 +30,7 @@ const CONFIG = {
   KEY_PURCHASES: "inplay:purchases",
   KEY_BALANCES: "balances",
   KEY_MODEL_COLLECTIVE: "model:collective",
+  KEY_MODEL_MINT: "model:mint",
 
   MODEL_PRICES,
 

@@ -112,6 +112,16 @@ type CollectivePurchaseStats = {
   }[];
 };
 
+/* ------------- BOT:MINT ---------*/
+type MintItem = {
+  id: string;
+  symbol: string;
+  rallyPrice: number;
+  nextAction: "PURCHASE" | "SELL";
+  usd: number;
+  nextCheckAt: number;
+  lastQuantity?: number;
+};
 /* --------------- BINANCE TYPES ------------- */
 
 type OrderSide = "BUY" | "SELL";
@@ -159,4 +169,5 @@ export {
   CollectivePurchase,
   CollectivePurchaseItem,
   ModelCollective,
+  MintItem,
 };
