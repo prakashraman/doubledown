@@ -43,7 +43,7 @@ const run = async () => {
       const symbol = item.symbol;
 
       // Check to see if a purchase can be made
-      if (item.nextAction === "PURCHASE" && item.rallyPrice < price) {
+      if (item.nextAction === "PURCHASE" && item.rallyPrice > price) {
         const quantity = item.usd / price;
         logger.info("mint purchase", {
           bot: "mint",
