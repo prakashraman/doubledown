@@ -80,7 +80,7 @@ const run = async () => {
         item.nextAction === "SELL" &&
         increaseByPercent(item.rallyPrice, 0.5) < price
       ) {
-        const quantity = item.usd / price;
+        const quantity = (item.lastQuantity * item.lastExecutedPrice) / price;
 
         logger.info("mint sell", {
           bot: "mint",
