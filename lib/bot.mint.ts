@@ -45,7 +45,13 @@ const run = async () => {
       // Check to see if a purchase can be made
       if (item.nextAction === "PURCHASE" && item.rallyPrice < price) {
         const quantity = item.usd / price;
-        logger.info("mint purchase", { bot: "mint", symbol, price, quantity });
+        logger.info("mint purchase", {
+          bot: "mint",
+          symbol,
+          price,
+          quantity,
+          usd: item.usd,
+        });
 
         if (!(await hasBalanceForPurchase(symbol, item.usd))) {
           return logger.info("insufficient balance to purchase", {

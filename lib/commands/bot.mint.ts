@@ -5,7 +5,9 @@ import { OptionValues } from "commander";
 import { getPrice } from "../market";
 import { addItem } from "../bot.mint";
 
-const get = async (options: OptionValues) => {};
+const get = async (options: OptionValues) => {
+  console.log("todo");
+};
 
 const add = async (options: OptionValues) => {
   const { symbol, usd } = options;
