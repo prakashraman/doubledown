@@ -59,4 +59,11 @@ program
   .description("set's the collective purchase sell price")
   .action(actions.botCollective.setSellPrice);
 
+// bot:mint
+program
+  .command("bot:mint:add")
+  .requiredOption("-s, --symbol <string>", "symbol")
+  .requiredOption("-u, --usd <float>", "key usd amount", parseFloat)
+  .action(actions.botMint.add);
+
 program.parse(process.argv);

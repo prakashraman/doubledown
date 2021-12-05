@@ -4,6 +4,7 @@ import { CronJob } from "cron";
 
 import { run } from "./lib/bot";
 import collective from "./lib/bot.collective";
+import mint from "./lib/bot.mint";
 import { logger } from "./lib/init";
 import { updateBalances } from "./lib/balance";
 import * as db from "./lib/db";
@@ -23,6 +24,13 @@ const bot = new CronJob("*/10 * * * * *", run);
  * Go through the "collective.run" method to figure things out
  */
 const botCollective = new CronJob("*/10 * * * * *", collective.run);
+
+/**
+ * Runs the mint bot every 20 seconds (or see cron spec below)
+ *
+ * Go through the "mint.run" method to figure things out
+ */
+const botMint = new CronJob("*/20 * * * * *", mint.run);
 
 /**
  * Update the account balances
@@ -45,6 +53,7 @@ const check = async () => {
   balances.start();
   bot.start();
   botCollective.start();
+  botMint.start();
 };
 
 (() => {

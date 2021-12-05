@@ -11,7 +11,7 @@
  * every 3 hours, albeit keeping a few bounds in mind
  */
 
-import { map, sum, filter, each, reduce, add } from "lodash";
+import { map, reduce } from "lodash";
 import moment from "moment";
 
 import { createLimitOrder, getAllPrices } from "./market";
@@ -28,21 +28,32 @@ import { hasBalanceForPurchase } from "./bot";
  * It performs the "purchase" and "sell" checks
  */
 const run = async () => {
-  logger.info("bot:mint run");
   const items = await getMintItems();
-  const now = moment().unix();
+  logger.info("bot:mint run", { count: items.length });
+
+  if (items.length === 0) return;
+
   const prices = await getAllPrices();
 
-  Promise.all(
+  await Promise.all(
     map(items, async (item) => {
-      if (item.nextCheckAt > now) return;
+      if (item.nextCheckAt > moment().unix()) return;
 
       const price = prices[item.symbol];
       const symbol = item.symbol;
 
-      if (item.nextAction === "PURCHASE" && item.rallyPrice > price) {
+      // Check to see if a purchase can be made
+      if (item.nextAction === "PURCHASE" && item.rallyPrice < price) {
         const quantity = item.usd / price;
         logger.info("mint purchase", { bot: "mint", symbol, price, quantity });
+
+        if (!(await hasBalanceForPurchase(symbol, item.usd))) {
+          return logger.info("insufficient balance to purchase", {
+            symbol,
+            bot: "mint",
+            amount: item.usd,
+          });
+        }
 
         const order = await createLimitOrder({
           symbol,
@@ -58,6 +69,7 @@ const run = async () => {
           nextAction: "SELL",
         });
       } else if (
+        // else check to see if a sale can be made
         item.nextAction === "SELL" &&
         increaseByPercent(item.rallyPrice, 0.5) < price
       ) {
@@ -71,7 +83,7 @@ const run = async () => {
           minted: item.lastQuantity - quantity,
         });
 
-        createLimitOrder({
+        await createLimitOrder({
           symbol,
           price,
           quantity,
@@ -94,10 +106,7 @@ const run = async () => {
  * @param {MintItem} item
  */
 const addItem = async (item: MintItem) => {
-  await db.setJSON(CONFIG.KEY_MODEL_COLLECTIVE, [
-    ...(await getMintItems()),
-    item,
-  ]);
+  await db.setJSON(CONFIG.KEY_MODEL_MINT, [...(await getMintItems()), item]);
 };
 
 /**
@@ -106,7 +115,7 @@ const addItem = async (item: MintItem) => {
  * @returns Promise<MintItem[]>
  */
 const getMintItems = async (): Promise<MintItem[]> => {
-  return (await (db.getJSON(CONFIG.KEY_MODEL_MINT) || [])) as MintItem[];
+  return ((await db.getJSON(CONFIG.KEY_MODEL_MINT)) || []) as MintItem[];
 };
 
 /**
@@ -120,10 +129,11 @@ const setItem = async (item: MintItem) => {
     (acc, curr) => {
       return item.id === curr.id ? [...acc, item] : [...acc, curr];
     },
-    []
+    [] as MintItem[]
   );
 
   await db.setJSON(CONFIG.KEY_MODEL_MINT, items);
 };
 
 export default { run };
+export { addItem };
