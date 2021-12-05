@@ -78,7 +78,7 @@ const run = async () => {
       } else if (
         // else check to see if a sale can be made
         item.nextAction === "SELL" &&
-        increaseByPercent(item.rallyPrice, 0.5) < price
+        increaseByPercent(item.lastExecutedPrice, 0.5) < price
       ) {
         const quantity = (item.lastQuantity * item.lastExecutedPrice) / price;
 
