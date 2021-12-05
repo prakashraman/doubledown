@@ -61,9 +61,19 @@ program
 
 // bot:mint
 program
+  .command("bot:mint:get")
+  .description("display the list of active mint items")
+  .action(actions.botMint.get);
+program
   .command("bot:mint:add")
   .requiredOption("-s, --symbol <string>", "symbol")
   .requiredOption("-u, --usd <float>", "key usd amount", parseFloat)
   .action(actions.botMint.add);
+program
+  .command("bot:mint:shift_rally_price")
+  .requiredOption("--id <string>", "ID of the item")
+  .option("-rp, --rallyprice <float>", "New rally price", parseFloat)
+  .description("Adjust the rally price of a particular item")
+  .action(actions.botMint.shiftRally);
 
 program.parse(process.argv);

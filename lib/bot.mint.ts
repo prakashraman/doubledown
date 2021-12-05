@@ -11,7 +11,7 @@
  * every 3 hours, albeit keeping a few bounds in mind
  */
 
-import { map, reduce } from "lodash";
+import { map, reduce, find } from "lodash";
 import moment from "moment";
 
 import { createLimitOrder, getAllPrices } from "./market";
@@ -71,7 +71,8 @@ const run = async () => {
         await setItem({
           ...item,
           lastQuantity: order.filledQuantity,
-          nextCheckAt: moment.unix(item.nextCheckAt).unix(),
+          lastExecutedPrice: order.price,
+          nextCheckAt: moment.unix(item.nextCheckAt).add(3, "hours").unix(),
           nextAction: "SELL",
         });
       } else if (
@@ -141,5 +142,15 @@ const setItem = async (item: MintItem) => {
   await db.setJSON(CONFIG.KEY_MODEL_MINT, items);
 };
 
+/**
+ * Find an item based on id
+ *
+ * @param {string} id
+ * @returns Promise
+ */
+const getItem = async (id: string): Promise<MintItem> => {
+  return find(await getMintItems(), (item) => item.id === id);
+};
+
 export default { run };
-export { addItem };
+export { addItem, getMintItems, getItem, setItem };

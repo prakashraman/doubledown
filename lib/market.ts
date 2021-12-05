@@ -162,7 +162,7 @@ const createLimitOrder = async ({
                   : adjusted.quantity - tradeInfo.commission;
               const args = {
                 symbol,
-                price,
+                price: tradeInfo.price,
                 quantity: adjusted.quantity,
                 side,
                 orderId,
@@ -257,6 +257,7 @@ type TradeInfoResult = {
   orderId: number;
   commission: number;
   commissionAsset: string;
+  price: number;
 };
 
 /**
@@ -288,6 +289,7 @@ const getTradeInfo = (
             symbol,
             orderId,
             commission: +trade.commission,
+            price: +trade.price,
             commissionAsset: trade.commissionAsset,
           });
         }

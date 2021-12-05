@@ -1,12 +1,42 @@
 import { table } from "table";
 import moment from "moment";
+import { map } from "lodash";
 
 import { OptionValues } from "commander";
-import { getPrice } from "../market";
-import { addItem } from "../bot.mint";
+import { getAllPrices, getPrice } from "../market";
+import { addItem, getMintItems, getItem, setItem } from "../bot.mint";
+import { increaseByPercent } from "../utils";
 
 const get = async (options: OptionValues) => {
-  console.log("todo");
+  const items = await getMintItems();
+  const prices = await getAllPrices();
+  const columns = [
+    "ID",
+    "Symbol",
+    "Next Action",
+    "Last Quantity",
+    "Rally Price",
+    "Current Price",
+    "Sell Above",
+    "Next Checkin",
+  ];
+
+  const data = map(items, (item) => {
+    return [
+      item.id,
+      item.symbol,
+      item.nextAction,
+      item.lastQuantity,
+      item.rallyPrice,
+      prices[item.symbol],
+      item.nextAction === "SELL"
+        ? increaseByPercent(item.rallyPrice, 0.5)
+        : "-",
+      moment.unix(item.nextCheckAt).format("LLL"),
+    ];
+  });
+
+  console.log(table([columns, ...data]));
 };
 
 const add = async (options: OptionValues) => {
@@ -24,4 +54,14 @@ const add = async (options: OptionValues) => {
   });
 };
 
-export default { get, add };
+const shiftRally = async (options: OptionValues) => {
+  const item = await getItem(options.id);
+  const rp = options.rallyprice ?? (await getPrice(item.symbol));
+
+  await setItem({
+    ...item,
+    rallyPrice: rp,
+  });
+};
+
+export default { get, add, shiftRally };
