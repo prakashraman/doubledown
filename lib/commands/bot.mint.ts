@@ -64,4 +64,13 @@ const shiftRally = async (options: OptionValues) => {
   });
 };
 
-export default { get, add, shiftRally };
+const forceCheckin = async (options: OptionValues) => {
+  const item = await getItem(options.id);
+
+  await setItem({
+    ...item,
+    nextCheckAt: moment().unix(),
+  });
+};
+
+export default { get, add, shiftRally, forceCheckin };

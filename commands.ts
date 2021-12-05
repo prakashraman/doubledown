@@ -75,5 +75,10 @@ program
   .option("-rp, --rallyprice <float>", "New rally price", parseFloat)
   .description("Adjust the rally price of a particular item")
   .action(actions.botMint.shiftRally);
+program
+  .command("bot:mint:force_checkin")
+  .requiredOption("--id <string>", "ID of the item")
+  .description("Forces the item to checkin")
+  .action(actions.botMint.forceCheckin);
 
 program.parse(process.argv);
