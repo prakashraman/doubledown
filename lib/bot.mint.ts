@@ -37,14 +37,7 @@ const run = async () => {
 
   await Promise.all(
     map(items, async (item) => {
-      if (item.nextCheckAt > moment().unix()) {
-        logger.info("skip checkin", {
-          bot: "mint",
-          now: moment().unix(),
-          nextCheckAt: item.nextCheckAt,
-        });
-        return;
-      }
+      if (item.nextCheckAt > moment().unix()) return;
 
       const price = prices[item.symbol];
       const symbol = item.symbol;
