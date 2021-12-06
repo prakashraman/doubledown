@@ -30,7 +30,7 @@ const get = async (options: OptionValues) => {
       item.rallyPrice,
       prices[item.symbol],
       item.nextAction === "SELL"
-        ? increaseByPercent(item.lastExecutedPrice, 0.5)
+        ? increaseByPercent(item.lastExecutedPrice, 0.5).toFixed(2)
         : "-",
       moment.unix(item.nextCheckAt).format("LLL"),
     ];
