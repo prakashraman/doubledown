@@ -79,7 +79,7 @@ const run = async () => {
           ...item,
           lastQuantity: order.filledQuantity,
           lastExecutedPrice: order.price,
-          nextCheckAt: moment.unix(item.nextCheckAt).add(3, "hours").unix(),
+          nextCheckAt: moment().add(3, "hours").unix(),
           nextAction: "SELL",
         });
       } else if (
@@ -106,7 +106,7 @@ const run = async () => {
 
         await setItem({
           ...item,
-          nextCheckAt: moment.unix(item.nextCheckAt).add(3, "hours").unix(),
+          nextCheckAt: moment().add(3, "hours").unix(),
           nextAction: "PURCHASE",
         });
       }
