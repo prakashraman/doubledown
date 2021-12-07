@@ -1,6 +1,7 @@
 import { table } from "table";
 import moment from "moment";
 import { map, sum } from "lodash";
+import humanizeDuration from "humanize-duration";
 
 import { OptionValues } from "commander";
 import { getAllPrices, getPrice } from "../market";
@@ -36,7 +37,9 @@ const get = async (options: OptionValues) => {
       item.nextAction === "SELL"
         ? increaseByPercent(item.lastExecutedPrice, 0.5).toFixed(2)
         : "-",
-      diff > 0 ? moment.duration(diff).humanize(true, { M: 10 }) : "now",
+      diff > 0
+        ? humanizeDuration(diff, { units: ["h", "m"], round: true })
+        : "now",
       `${sum(minted)} (${minted.length})`,
     ];
   });
