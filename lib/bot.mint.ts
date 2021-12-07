@@ -17,7 +17,7 @@ import moment from "moment";
 import { createLimitOrder, getAllPrices } from "./market";
 import CONFIG from "./config";
 import { logger } from "./init";
-import { increaseByPercent } from "./utils";
+import { increaseByPercent, randomNumber } from "./utils";
 import { MintItem } from "./types";
 import * as db from "./db";
 import { hasBalanceForPurchase } from "./bot";
@@ -108,7 +108,8 @@ const run = async () => {
         // If unable to sell yet, delay the next check by an hour
         await setItem({
           ...item,
-          nextCheckAt: moment().add(1, "hour").unix(),
+          // delays the next check by a random number of mins (< 120)
+          nextCheckAt: moment().add(randomNumber(10, 120), "minute").unix(),
         });
       }
     })

@@ -10,4 +10,15 @@ const increaseByPercent = (no: number, percent: number): number => {
   return +no + value * (percent < 0 ? -1 : 1);
 };
 
-export { increaseByPercent };
+/**
+ * Generate a random number within a range
+ *
+ * @param {number} min
+ * @param {number} max
+ * @returns Number
+ */
+const randomNumber = (min: number, max: number): number => {
+  return Math.floor(Math.random() * (max - min) + min);
+};
+
+export { increaseByPercent, randomNumber };
