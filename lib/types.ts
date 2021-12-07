@@ -122,6 +122,7 @@ type MintItem = {
   nextCheckAt: number;
   lastQuantity?: number;
   lastExecutedPrice?: number;
+  minted?: number[];
 };
 /* --------------- BINANCE TYPES ------------- */
 

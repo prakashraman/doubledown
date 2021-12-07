@@ -81,13 +81,14 @@ const run = async () => {
         increaseByPercent(item.lastExecutedPrice, 0.5) < price
       ) {
         const quantity = (item.lastQuantity * item.lastExecutedPrice) / price;
+        const minted = item.lastQuantity - quantity;
 
         logger.info("mint sell", {
           bot: "mint",
           symbol,
           price,
           quantity,
-          minted: item.lastQuantity - quantity,
+          minted,
         });
 
         await createLimitOrder({
@@ -101,6 +102,7 @@ const run = async () => {
           ...item,
           nextCheckAt: moment().add(3, "hours").unix(),
           nextAction: "PURCHASE",
+          minted: [...(item.minted ?? []), minted], // fancy code to make sure it's backward compatible
         });
       }
     })
