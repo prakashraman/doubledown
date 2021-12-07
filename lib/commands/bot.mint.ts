@@ -1,6 +1,6 @@
 import { table } from "table";
 import moment from "moment";
-import { map } from "lodash";
+import { map, sum } from "lodash";
 
 import { OptionValues } from "commander";
 import { getAllPrices, getPrice } from "../market";
@@ -19,10 +19,12 @@ const get = async (options: OptionValues) => {
     "Current Price",
     "Sell Above",
     "Next Checkin",
+    "Minted",
   ];
 
   const data = map(items, (item) => {
-    const diff = moment.unix(item.nextCheckAt).diff(moment());
+    const diff = moment().diff(moment.unix(item.nextCheckAt));
+    const minted = item.minted ?? [];
 
     return [
       item.id,
@@ -35,6 +37,7 @@ const get = async (options: OptionValues) => {
         ? increaseByPercent(item.lastExecutedPrice, 0.5).toFixed(2)
         : "-",
       moment.duration(diff).humanize(true),
+      `${sum(minted)} (${minted.length})`,
     ];
   });
 
