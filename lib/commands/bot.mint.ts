@@ -22,6 +22,8 @@ const get = async (options: OptionValues) => {
   ];
 
   const data = map(items, (item) => {
+    const diff = moment.unix(item.nextCheckAt).diff(moment());
+
     return [
       item.id,
       item.symbol,
@@ -32,7 +34,7 @@ const get = async (options: OptionValues) => {
       item.nextAction === "SELL"
         ? increaseByPercent(item.lastExecutedPrice, 0.5).toFixed(2)
         : "-",
-      moment.unix(item.nextCheckAt).format("LLL"),
+      moment.duration(diff).humanize(true),
     ];
   });
 
