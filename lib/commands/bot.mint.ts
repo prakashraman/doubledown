@@ -36,7 +36,7 @@ const get = async (options: OptionValues) => {
       item.nextAction === "SELL"
         ? increaseByPercent(item.lastExecutedPrice, 0.5).toFixed(2)
         : "-",
-      moment.duration(diff).humanize(true),
+      diff > 0 ? moment.duration(diff).humanize(true) : "now",
       `${sum(minted)} (${minted.length})`,
     ];
   });
@@ -75,6 +75,7 @@ const forceCheckin = async (options: OptionValues) => {
   await setItem({
     ...item,
     nextCheckAt: moment().unix(),
+    minted: [],
   });
 };
 
