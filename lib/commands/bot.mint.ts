@@ -23,7 +23,7 @@ const get = async (options: OptionValues) => {
   ];
 
   const data = map(items, (item) => {
-    const diff = moment().diff(moment.unix(item.nextCheckAt));
+    const diff = moment.unix(item.nextCheckAt).diff(moment());
     const minted = item.minted ?? [];
 
     return [
@@ -36,7 +36,7 @@ const get = async (options: OptionValues) => {
       item.nextAction === "SELL"
         ? increaseByPercent(item.lastExecutedPrice, 0.5).toFixed(2)
         : "-",
-      diff > 0 ? moment.duration(diff).humanize(true) : "now",
+      diff > 0 ? moment.duration(diff).humanize(true, { M: 10 }) : "now",
       `${sum(minted)} (${minted.length})`,
     ];
   });
