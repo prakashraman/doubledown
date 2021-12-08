@@ -59,6 +59,7 @@ const add = async (options: OptionValues) => {
     nextCheckAt: moment().unix(),
     nextAction: "PURCHASE",
     rallyPrice: price,
+    minted: [],
   });
 };
 
@@ -78,7 +79,6 @@ const forceCheckin = async (options: OptionValues) => {
   await setItem({
     ...item,
     nextCheckAt: moment().unix(),
-    minted: [],
   });
 };
 
