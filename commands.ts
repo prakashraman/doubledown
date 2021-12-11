@@ -80,5 +80,10 @@ program
   .requiredOption("--id <string>", "ID of the item")
   .description("Forces the item to checkin")
   .action(actions.botMint.forceCheckin);
+program
+  .command("bot:mint:remove")
+  .requiredOption("--id <string>", "ID of the item to be removed")
+  .description("remove an item from the mill")
+  .action(actions.botMint.remove);
 
 program.parse(process.argv);

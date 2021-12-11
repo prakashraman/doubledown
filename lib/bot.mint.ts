@@ -11,7 +11,7 @@
  * every 3 hours, albeit keeping a few bounds in mind
  */
 
-import { map, reduce, find } from "lodash";
+import { map, reduce, find, filter } from "lodash";
 import moment from "moment";
 
 import { createLimitOrder, getAllPrices } from "./market";
@@ -152,6 +152,19 @@ const setItem = async (item: MintItem) => {
 };
 
 /**
+ * Removes a particular item by id
+ *
+ * @param {string} id
+ */
+const removeItemById = async (id: string) => {
+  const items = filter(await getMintItems(), (item) => {
+    return `${item.id}` != id;
+  });
+
+  await db.setJSON(CONFIG.KEY_MODEL_MINT, items);
+};
+
+/**
  * Find an item based on id
  *
  * @param {string} id
@@ -162,4 +175,4 @@ const getItem = async (id: string): Promise<MintItem> => {
 };
 
 export default { run };
-export { addItem, getMintItems, getItem, setItem };
+export { addItem, getMintItems, getItem, setItem, removeItemById };

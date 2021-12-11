@@ -5,8 +5,15 @@ import humanizeDuration from "humanize-duration";
 
 import { OptionValues } from "commander";
 import { getAllPrices, getPrice } from "../market";
-import { addItem, getMintItems, getItem, setItem } from "../bot.mint";
+import {
+  addItem,
+  getMintItems,
+  getItem,
+  setItem,
+  removeItemById,
+} from "../bot.mint";
 import { increaseByPercent } from "../utils";
+import { logger } from "../init";
 
 const get = async (options: OptionValues) => {
   const items = await getMintItems();
@@ -82,4 +89,11 @@ const forceCheckin = async (options: OptionValues) => {
   });
 };
 
-export default { get, add, shiftRally, forceCheckin };
+const remove = async (option: OptionValues) => {
+  const id = option.id;
+  await removeItemById(id);
+
+  logger.info("item removed", { id });
+};
+
+export default { get, add, shiftRally, forceCheckin, remove };
