@@ -22,7 +22,7 @@ const get = async (options: OptionValues) => {
     "ID",
     "Symbol",
     "Next Action",
-    "Last Quantity",
+    "USD",
     "Rally Price",
     "Current Price",
     "Sell Above",
@@ -38,7 +38,7 @@ const get = async (options: OptionValues) => {
       item.id,
       item.symbol,
       item.nextAction,
-      item.lastQuantity,
+      item.usd,
       item.rallyPrice,
       prices[item.symbol],
       item.nextAction === "SELL"
