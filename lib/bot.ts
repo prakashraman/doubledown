@@ -36,10 +36,6 @@ const models: Model[] = [
     symbol: "ETHUSDT",
     price: MODEL_PRICES.ETHUSDT,
   },
-  {
-    symbol: "CHRUSDT",
-    price: MODEL_PRICES.CHRUSDT,
-  },
 ];
 
 /**
