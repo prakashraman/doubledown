@@ -95,9 +95,10 @@ const run = async () => {
 
       await db.set(`price:${symbol}`, `${price}`);
       await checkForPurchase(model, price);
-      await checkForSell(model, price);
     })
   );
+
+  await checkForSell(prices);
 };
 
 /**
@@ -201,17 +202,15 @@ const getNextPurchaseLevel = async (symbol: string): Promise<Level | null> => {
 
   return diff[0];
 };
-
 /**
  * Determines if any of the purchases should be sold off. This method looks for
  * the first sellable purchase from the list
  *
- * @param {Model} model
- * @param {number} currentPrice
+ * @param {{ [key: string]: number }} prices
  */
-const checkForSell = async (model: Model, currentPrice: number) => {
-  const active = await getPurchasesOf(model.symbol);
-  const sellable = active.find((p) => p.sellAtPrice <= currentPrice);
+const checkForSell = async (prices: { [key: string]: number }) => {
+  const active = await getPurchases();
+  const sellable = active.find((p) => p.sellAtPrice <= prices[p.symbol]);
   if (!sellable) return;
 
   const { symbol, level } = sellable;
@@ -220,7 +219,7 @@ const checkForSell = async (model: Model, currentPrice: number) => {
   try {
     await createLimitOrder({
       symbol,
-      price: currentPrice,
+      price: prices[sellable.symbol],
       quantity: sellable.quantity,
       side: "SELL",
     });
