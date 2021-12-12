@@ -104,8 +104,8 @@ const run = async () => {
           nextAction: "PURCHASE",
           minted: [...(item.minted ?? []), minted], // fancy code to make sure it's backward compatible
         });
-      } else if (item.nextAction === "SELL") {
-        // If unable to sell yet, delay the next check by an hour
+      } else {
+        // If unable to act upon yet, delay the next check by a few minutes random minutes
         await setItem({
           ...item,
           // delays the next check by a random number of mins (< 120)
