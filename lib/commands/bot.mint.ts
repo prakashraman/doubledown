@@ -43,7 +43,7 @@ const get = async (options: OptionValues) => {
       item.rallyPrice,
       prices[item.symbol],
       item.nextAction === "SELL"
-        ? increaseByPercent(item.lastExecutedPrice, 0.5).toFixed(2)
+        ? increaseByPercent(item.lastExecutedPrice, 0.5).toFixed(5)
         : "-",
       diff > 0
         ? humanizeDuration(diff, { units: ["h", "m"], round: true })
