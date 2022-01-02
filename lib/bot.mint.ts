@@ -41,6 +41,7 @@ const run = async () => {
 
       const price = prices[item.symbol];
       const symbol = item.symbol;
+      const mintedQuantities = getItemMinted(item);
 
       // Check to see if a purchase can be made
       if (item.nextAction === "PURCHASE" && item.rallyPrice > price) {
@@ -78,7 +79,8 @@ const run = async () => {
       } else if (
         // else check to see if a sale can be made
         item.nextAction === "SELL" &&
-        increaseByPercent(item.lastExecutedPrice, 0.5) < price
+        increaseByPercent(item.lastExecutedPrice, 0.5) < price &&
+        mintedQuantities.length < CONFIG.BOT_MINT_MAX_ITEMS
       ) {
         const quantity = (item.lastQuantity * item.lastExecutedPrice) / price;
         const minted = item.lastQuantity - quantity;
@@ -174,5 +176,42 @@ const getItem = async (id: string): Promise<MintItem> => {
   return find(await getMintItems(), (item) => item.id === id);
 };
 
+/**
+ * Returns an array of minted quantities for the paricular Item
+ *
+ * @param {MintItem} item
+ * @returns Number[]
+ */
+const getItemMinted = (item: MintItem): number[] => {
+  return item.minted || [];
+};
+
+/**
+ * Returns a more information status for an item
+ *
+ * E.g considers max number of the items an items has been minted
+ *
+ * @param {MintItem} item
+ * @returns String
+ */
+const getStatusForItem = (item: MintItem): string => {
+  if (
+    item.nextAction === "SELL" &&
+    getItemMinted(item).length >= CONFIG.BOT_MINT_MAX_ITEMS
+  ) {
+    return "MAX MINTED (STOPPED)";
+  }
+
+  return item.nextAction;
+};
+
 export default { run };
-export { addItem, getMintItems, getItem, setItem, removeItemById };
+export {
+  addItem,
+  getMintItems,
+  getItem,
+  setItem,
+  removeItemById,
+  getItemMinted,
+  getStatusForItem,
+};

@@ -35,6 +35,7 @@ const CONFIG = {
   MODEL_PRICES,
 
   BOT_COLLECTIVE_POT: 500,
+  BOT_MINT_MAX_ITEMS: 10,
 };
 
 export default CONFIG;

@@ -11,6 +11,7 @@ import {
   getItem,
   setItem,
   removeItemById,
+  getStatusForItem,
 } from "../bot.mint";
 import { increaseByPercent } from "../utils";
 import { logger } from "../init";
@@ -37,7 +38,7 @@ const get = async (options: OptionValues) => {
     return [
       item.id,
       item.symbol,
-      item.nextAction,
+      getStatusForItem(item),
       item.usd,
       item.rallyPrice,
       prices[item.symbol],
