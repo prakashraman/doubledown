@@ -124,6 +124,22 @@ type MintItem = {
   lastExecutedPrice?: number;
   minted?: number[];
 };
+
+/* ---------- BOT:SPLITSHORT ------------- */
+type SplitShortItem = {
+  id: string;
+  symbol: string;
+  nextAction: "PURCHASE" | "SELL";
+  nextSellAbove?: number;
+  nextPurchaseBelow?: number;
+
+  // When a PURCHASE is made the new balance of the coin will be inserted
+  growth: number[];
+};
+
+type SplitShort = {
+  [key: string]: SplitShortItem;
+};
 /* --------------- BINANCE TYPES ------------- */
 
 type OrderSide = "BUY" | "SELL";
