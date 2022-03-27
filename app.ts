@@ -5,6 +5,7 @@ import { CronJob } from "cron";
 import { run } from "./lib/bot";
 import collective from "./lib/bot.collective";
 import mint from "./lib/bot.mint";
+import splitshort from "./lib/bot.splitshort";
 import { logger } from "./lib/init";
 import { updateBalances } from "./lib/balance";
 import * as db from "./lib/db";
@@ -40,6 +41,13 @@ const botMint = new CronJob("*/20 * * * * *", mint.run);
 const balances = new CronJob("* * * * *", updateBalances);
 
 /**
+ * Runs the mint bot every 20 seconds (or see cron spec below)
+ *
+ * Go through the "splitshort.run" method to figure things out
+ */
+const botSplitshort = new CronJob("*/20 * * * * *", splitshort.run);
+
+/**
  * Meant to check the application connections before starting the job
  *
  * - Checks the database connectivity
@@ -51,9 +59,10 @@ const check = async () => {
   }
 
   balances.start();
-  bot.start();
-  botCollective.start();
-  botMint.start();
+  // bot.start();
+  // botCollective.start();
+  // botMint.start();
+  botSplitshort.start();
 };
 
 (() => {

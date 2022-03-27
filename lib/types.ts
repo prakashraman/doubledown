@@ -130,7 +130,16 @@ type SplitShortItem = {
   id: string;
   symbol: string;
   nextAction: "PURCHASE" | "SELL";
-  nextSellAbove?: number;
+  status?: string;
+
+  // Determines when the SELL workflow would go into motion.
+  // Once the current prices reaches the nextSell.activate the
+  // nextSell.below is set and when the price falls below nextSell.below
+  // the SELL is executed
+  nextSell: {
+    below?: number | null;
+    activate: number;
+  };
   nextPurchaseBelow?: number;
 
   // When a PURCHASE is made the new balance of the coin will be inserted
@@ -188,4 +197,6 @@ export {
   CollectivePurchaseItem,
   ModelCollective,
   MintItem,
+  SplitShortItem,
+  SplitShort,
 };

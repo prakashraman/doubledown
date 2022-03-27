@@ -86,4 +86,12 @@ program
   .description("remove an item from the mill")
   .action(actions.botMint.remove);
 
+// bot.splitshort
+program
+  .command("bot:splitshort:add")
+  .requiredOption("-s, --symbol <string>", "Symbol")
+  .requiredOption("-a, --activateSell <float>", "Sell activate usd", parseFloat)
+  .description("Add the symbol into the fold")
+  .action(actions.botSplitshort.add);
+
 program.parse(process.argv);
