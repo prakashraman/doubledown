@@ -122,7 +122,7 @@ const run = async () => {
         });
         // Sets the nextSell.below
 
-        await updateItem({
+        const updatedItem = {
           ...item,
           nextSell: {
             ...item.nextSell,
@@ -131,7 +131,10 @@ const run = async () => {
               -CONFIG.BOT_SPLITSHORT_SELL_BELOW_ACTIVATE
             ),
           },
-        });
+        };
+
+        await updateItem(updatedItem);
+        logger.info("post update", { ...updatedItem });
       }
 
       return true;
@@ -208,6 +211,7 @@ const addItem = async (item: SplitShortItem) => {
  */
 const updateItem = async (item: SplitShortItem) => {
   const all = await get();
+  logger.info("update attempt", { ...item });
   await update({ ...all, [item.symbol]: item });
 };
 
