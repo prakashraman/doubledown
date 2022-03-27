@@ -11,13 +11,18 @@
 import { map, reduce, find, filter } from "lodash";
 import moment from "moment";
 
-import { createLimitOrder, getAllPrices, getBalances } from "./market";
+import {
+  createLimitOrder,
+  getAllPrices,
+  getBalances,
+  isLocked,
+} from "./market";
 import CONFIG from "./config";
 import { logger } from "./init";
-import { increaseByPercent, randomNumber } from "./utils";
+import { getCoinFromSymbol, increaseByPercent } from "./utils";
 import { SplitShort, SplitShortItem } from "./types";
 import * as db from "./db";
-import { hasBalanceForPurchase } from "./bot";
+import { updateBalances } from "./balance";
 
 /**
  * Main "run" operation for collective model
@@ -25,42 +30,102 @@ import { hasBalanceForPurchase } from "./bot";
  * It performs the "purchase" and "sell" checks
  */
 const run = async () => {
-  logger.info("bot:mint splitshort");
+  logger.info("bot:splitshort");
   const items = await getItems();
   const prices = await getAllPrices();
   const balances = await getBalances();
-
-  console.log({ balances, items });
 
   await Promise.all(
     map(items, async (item) => {
       const price = prices[item.symbol];
       const symbol = item.symbol;
+      const balance = balances[item.symbol.replace("USDT", "")];
 
-      // if (item.nextAction === "PURCHASE" && price < item.nextPurchaseBelow) {
-      //   const quantity = item.usd / price;
-      //   logger.info("mint purchase", {
-      //     bot: "splitshort",
-      //     symbol,
-      //     price,
-      //     quantity,
-      //   });
+      if (await isLocked(symbol)) {
+        logger.info("bot:splitshort symbol locked", { symbol });
+        return;
+      }
 
-      //   if (!(await hasBalanceForPurchase(symbol, item.usd))) {
-      //     return logger.info("insufficient balance to purchase", {
-      //       symbol,
-      //       bot: "mint",
-      //       amount: item.usd,
-      //     });
-      //   }
+      logger.info("bot splitshort precheck", {
+        action: item.nextAction,
+        symbol,
+        price,
+      });
 
-      //   const order = await createLimitOrder({
-      //     symbol,
-      //     price,
-      //     quantity,
-      //     side: "BUY",
-      //   });
-      // }
+      if (item.nextAction === "PURCHASE" && price < item.nextPurchaseBelow) {
+        const quantity = item.purchaseUsd / price;
+        logger.info("bot:splitshort", {
+          quantity,
+          price,
+          symbol,
+          action: "PURCHASE",
+        });
+
+        const result = await createLimitOrder({
+          symbol,
+          price,
+          quantity,
+          side: "SELL",
+        });
+        console.log({ result });
+
+        const updatedBalances = await updateBalances();
+        await updateItem({
+          ...item,
+          nextAction: "SELL",
+          nextSell: {
+            activate: increaseByPercent(
+              price,
+              CONFIG.BOT_SPLITSHORT_SELL_ABOVE_INCREASE
+            ),
+          },
+          growth: [...item.growth, updatedBalances[getCoinFromSymbol(symbol)]],
+        });
+      } else if (
+        item.nextAction === "SELL" &&
+        item.nextSell.below &&
+        price < item.nextSell.below
+      ) {
+        logger.info("splitshort", {
+          bot: "splitshort",
+          action: "SELL BELOW",
+          symbol,
+        });
+
+        const result = await createLimitOrder({
+          symbol,
+          price,
+          quantity: balance * CONFIG.BOT_SPLITSHORT_SELL_QUANTITY_SHARE,
+          side: "SELL",
+        });
+
+        console.log({ result });
+
+        await updateItem({
+          ...item,
+          nextAction: "PURCHASE",
+          nextPurchaseBelow: increaseByPercent(
+            price,
+            -CONFIG.BOT_SPLITSHORT_BUY_BELOW_INCREASE
+          ),
+          purchaseUsd: result.filledQuantity * price,
+        });
+      } else if (item.nextAction === "SELL" && price > item.nextSell.activate) {
+        logger.info("splitshort", {
+          bot: "splitshort",
+          action: "SELL ACTIVATE",
+          symbol,
+          price,
+          activate: item.nextSell.activate,
+        });
+        // Sets the nextSell.below
+        item.nextSell.below = increaseByPercent(
+          price,
+          -CONFIG.BOT_SPLITSHORT_SELL_BELOW_ACTIVATE
+        );
+
+        updateItem(item);
+      }
 
       return true;
     })
@@ -77,12 +142,27 @@ const get = async (): Promise<SplitShort> => {
 };
 
 /**
+ * Updates the database with the model
+ *
+ * @param {SplitShort} f Full structure
+ * @returns Promise
+ */
+const update = async (f: SplitShort): Promise<SplitShort> => {
+  await db.setJSON(CONFIG.KEY_MODEL_SPLITSHORT, f);
+  return f;
+};
+
+/**
  * Returns the list of items
  *
  * @returns Promise
  */
 const getItems = async (): Promise<SplitShortItem[]> => {
-  return [];
+  const all = await get();
+
+  if (!all) return [];
+
+  return map(all, (item, _key) => item);
 };
 
 /**
@@ -91,8 +171,36 @@ const getItems = async (): Promise<SplitShortItem[]> => {
  * @param {SplitShortItem} item
  */
 const addItem = async (item: SplitShortItem) => {
-  throw new Error("Symbol is already present in the database");
+  const all = await get();
+
+  if (all[item.symbol])
+    throw new Error("Symbol is already present in the database");
+
+  await updateItem(item);
+};
+
+/**
+ * Updates the item in the database
+ *
+ * @param {SplitShortItem} item
+ */
+const updateItem = async (item: SplitShortItem) => {
+  const all = await get();
+  await update({ ...all, [item.symbol]: item });
+};
+
+/**
+ * Remove a symbol from the model
+ *
+ * @param {string} symbol
+ */
+const remove = async (symbol: string) => {
+  const all = await get();
+  delete all[symbol];
+
+  logger.info("splitshort: removing symbol", { symbol });
+  await update({ ...all });
 };
 
 export default { run };
-export { addItem };
+export { addItem, remove };

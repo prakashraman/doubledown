@@ -21,4 +21,16 @@ const randomNumber = (min: number, max: number): number => {
   return Math.floor(Math.random() * (max - min) + min);
 };
 
-export { increaseByPercent, randomNumber };
+/**
+ * Infers the coin name from a symbol
+ *
+ * BTCUSDT = BCT
+ *
+ * @param {string} s
+ * @returns String
+ */
+const getCoinFromSymbol = (s: string): string => {
+  return s.replace("USDT", "");
+};
+
+export { increaseByPercent, randomNumber, getCoinFromSymbol };

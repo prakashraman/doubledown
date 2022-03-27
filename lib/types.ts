@@ -131,6 +131,7 @@ type SplitShortItem = {
   symbol: string;
   nextAction: "PURCHASE" | "SELL";
   status?: string;
+  purchaseUsd?: number;
 
   // Determines when the SELL workflow would go into motion.
   // Once the current prices reaches the nextSell.activate the

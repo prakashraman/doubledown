@@ -6,7 +6,7 @@ import humanizeDuration from "humanize-duration";
 import { OptionValues } from "commander";
 import { getAllPrices, getPrice } from "../market";
 import { logger } from "../init";
-import { addItem } from "../bot.splitshort";
+import { addItem, remove as removeSymbol } from "../bot.splitshort";
 
 const add = async (options: OptionValues) => {
   const { symbol, activateSell } = options;
@@ -22,6 +22,13 @@ const add = async (options: OptionValues) => {
     },
     growth: [],
   });
+  logger.info("cmd additem");
+  return;
 };
 
-export default { add };
+const remove = async (options: OptionValues) => {
+  const { symbol } = options;
+  removeSymbol(symbol);
+};
+
+export default { add, remove };

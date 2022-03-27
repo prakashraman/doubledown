@@ -9,11 +9,12 @@ import { logger } from "./init";
  *
  * Stored as a simple BalancesResult{[key: string]: number}
  */
-const updateBalances = async () => {
+const updateBalances = async (): Promise<BalancesResult> => {
   logger.info("balance check");
   const balances = await getMarketBalances();
 
   await db.setJSON(CONFIG.KEY_BALANCES, balances);
+  return balances;
 };
 /**
  * Returns the balances which are stored in the db

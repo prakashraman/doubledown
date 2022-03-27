@@ -93,5 +93,10 @@ program
   .requiredOption("-a, --activateSell <float>", "Sell activate usd", parseFloat)
   .description("Add the symbol into the fold")
   .action(actions.botSplitshort.add);
+program
+  .command("bot:splitshort:remove")
+  .requiredOption("-s, --symbol <string>", "Symbol")
+  .description("Remove a symbol")
+  .action(actions.botSplitshort.remove);
 
 program.parse(process.argv);
