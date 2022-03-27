@@ -35,111 +35,107 @@ const run = async () => {
   const prices = await getAllPrices();
   const balances = await getBalances();
 
-  await Promise.all(
-    map(items, async (item) => {
-      const price = prices[item.symbol];
-      const symbol = item.symbol;
-      const balance = balances[item.symbol.replace("USDT", "")];
+  for (const item of items) {
+    const price = prices[item.symbol];
+    const symbol = item.symbol;
+    const balance = balances[item.symbol.replace("USDT", "")];
 
-      if (await isLocked(symbol)) {
-        logger.info("bot:splitshort symbol locked", { symbol });
-        return;
-      }
+    if (await isLocked(symbol)) {
+      logger.info("bot:splitshort symbol locked", { symbol });
+      continue;
+    }
 
-      logger.info("bot splitshort precheck", {
-        action: item.nextAction,
-        symbol,
+    logger.info("bot splitshort precheck", {
+      action: item.nextAction,
+      symbol,
+      price,
+    });
+
+    if (item.nextAction === "PURCHASE" && price < item.nextPurchaseBelow) {
+      const quantity = item.purchaseUsd / price;
+      logger.info("bot:splitshort", {
+        quantity,
         price,
+        symbol,
+        action: "PURCHASE",
       });
 
-      if (item.nextAction === "PURCHASE" && price < item.nextPurchaseBelow) {
-        const quantity = item.purchaseUsd / price;
-        logger.info("bot:splitshort", {
-          quantity,
-          price,
-          symbol,
-          action: "PURCHASE",
-        });
+      const result = await createLimitOrder({
+        symbol,
+        price,
+        quantity,
+        side: "SELL",
+      });
+      console.log({ result });
 
-        const result = await createLimitOrder({
-          symbol,
-          price,
-          quantity,
-          side: "SELL",
-        });
-        console.log({ result });
-
-        const updatedBalances = await updateBalances();
-        await updateItem({
-          ...item,
-          nextAction: "SELL",
-          purchaseUsd: null,
-          nextPurchaseBelow: null,
-          nextSell: {
-            activate: increaseByPercent(
-              price,
-              CONFIG.BOT_SPLITSHORT_SELL_ABOVE_INCREASE
-            ),
-          },
-          growth: [...item.growth, updatedBalances[getCoinFromSymbol(symbol)]],
-        });
-      } else if (
-        item.nextAction === "SELL" &&
-        item.nextSell.below &&
-        price < item.nextSell.below
-      ) {
-        logger.info("splitshort", {
-          bot: "splitshort",
-          action: "SELL BELOW",
-          symbol,
-        });
-
-        const result = await createLimitOrder({
-          symbol,
-          price,
-          quantity: balance * CONFIG.BOT_SPLITSHORT_SELL_QUANTITY_SHARE,
-          side: "SELL",
-        });
-
-        console.log({ result });
-
-        await updateItem({
-          ...item,
-          nextAction: "PURCHASE",
-          nextPurchaseBelow: increaseByPercent(
+      const updatedBalances = await updateBalances();
+      await updateItem({
+        ...item,
+        nextAction: "SELL",
+        purchaseUsd: null,
+        nextPurchaseBelow: null,
+        nextSell: {
+          activate: increaseByPercent(
             price,
-            -CONFIG.BOT_SPLITSHORT_BUY_BELOW_INCREASE
+            CONFIG.BOT_SPLITSHORT_SELL_ABOVE_INCREASE
           ),
-          purchaseUsd: result.filledQuantity * price,
-        });
-      } else if (item.nextAction === "SELL" && price > item.nextSell.activate) {
-        logger.info("splitshort", {
-          bot: "splitshort",
-          action: "SELL ACTIVATE",
-          symbol,
+        },
+        growth: [...item.growth, updatedBalances[getCoinFromSymbol(symbol)]],
+      });
+    } else if (
+      item.nextAction === "SELL" &&
+      item.nextSell.below &&
+      price < item.nextSell.below
+    ) {
+      logger.info("splitshort", {
+        bot: "splitshort",
+        action: "SELL BELOW",
+        symbol,
+      });
+
+      const result = await createLimitOrder({
+        symbol,
+        price,
+        quantity: balance * CONFIG.BOT_SPLITSHORT_SELL_QUANTITY_SHARE,
+        side: "SELL",
+      });
+
+      console.log({ result });
+
+      await updateItem({
+        ...item,
+        nextAction: "PURCHASE",
+        nextPurchaseBelow: increaseByPercent(
           price,
-          activate: item.nextSell.activate,
-        });
-        // Sets the nextSell.below
+          -CONFIG.BOT_SPLITSHORT_BUY_BELOW_INCREASE
+        ),
+        purchaseUsd: result.filledQuantity * price,
+      });
+    } else if (item.nextAction === "SELL" && price > item.nextSell.activate) {
+      logger.info("splitshort", {
+        bot: "splitshort",
+        action: "SELL ACTIVATE",
+        symbol,
+        price,
+        activate: item.nextSell.activate,
+      });
+      // Sets the nextSell.below
 
-        const updatedItem = {
-          ...item,
-          nextSell: {
-            ...item.nextSell,
-            below: increaseByPercent(
-              price,
-              -CONFIG.BOT_SPLITSHORT_SELL_BELOW_ACTIVATE
-            ),
-          },
-        };
+      const updatedItem = {
+        ...item,
+        nextSell: {
+          ...item.nextSell,
+          below: increaseByPercent(
+            price,
+            -CONFIG.BOT_SPLITSHORT_SELL_BELOW_ACTIVATE
+          ),
+        },
+      };
 
-        await updateItem(updatedItem);
-        logger.info("post update", { ...updatedItem });
-      }
-
-      return true;
-    })
-  );
+      await updateItem(updatedItem);
+      logger.info("post update", { ...updatedItem });
+    }
+  }
 };
 
 /**
