@@ -126,7 +126,7 @@ const run = async () => {
           -CONFIG.BOT_SPLITSHORT_SELL_BELOW_ACTIVATE
         );
 
-        updateItem(item);
+        await updateItem({ ...item });
       }
 
       return true;
