@@ -84,6 +84,7 @@ const run = async () => {
       });
     } else if (
       item.nextAction === "SELL" &&
+      item.nextSell &&
       item.nextSell.below &&
       price < item.nextSell.below
     ) {
@@ -111,7 +112,12 @@ const run = async () => {
         ),
         purchaseUsd: result.filledQuantity * price,
       });
-    } else if (item.nextAction === "SELL" && price > item.nextSell.activate) {
+    } else if (
+      item.nextAction === "SELL" &&
+      item.nextSell &&
+      item.nextSell.activate &&
+      price > item.nextSell.activate
+    ) {
       logger.info("splitshort", {
         bot: "splitshort",
         action: "SELL ACTIVATE",
