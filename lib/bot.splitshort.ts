@@ -133,7 +133,6 @@ const run = async () => {
       };
 
       await updateItem(updatedItem);
-      logger.info("post update", { ...updatedItem });
     }
   }
 };
@@ -207,7 +206,6 @@ const addItem = async (item: SplitShortItem) => {
  */
 const updateItem = async (item: SplitShortItem) => {
   const all = await get();
-  logger.info("update attempt", { ...item });
   await update({ ...all, [item.symbol]: item });
 };
 
