@@ -121,12 +121,17 @@ const run = async () => {
           activate: item.nextSell.activate,
         });
         // Sets the nextSell.below
-        item.nextSell.below = increaseByPercent(
-          price,
-          -CONFIG.BOT_SPLITSHORT_SELL_BELOW_ACTIVATE
-        );
 
-        await updateItem({ ...item });
+        await updateItem({
+          ...item,
+          nextSell: {
+            ...item.nextSell,
+            below: increaseByPercent(
+              price,
+              -CONFIG.BOT_SPLITSHORT_SELL_BELOW_ACTIVATE
+            ),
+          },
+        });
       }
 
       return true;
