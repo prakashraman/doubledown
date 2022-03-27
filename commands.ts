@@ -88,6 +88,10 @@ program
 
 // bot.splitshort
 program
+  .command("bot:splitshort:get")
+  .description("display the list of splitshort")
+  .action(actions.botSplitshort.get);
+program
   .command("bot:splitshort:add")
   .requiredOption("-s, --symbol <string>", "Symbol")
   .requiredOption("-a, --activateSell <float>", "Sell activate usd", parseFloat)

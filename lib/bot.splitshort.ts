@@ -73,6 +73,8 @@ const run = async () => {
         await updateItem({
           ...item,
           nextAction: "SELL",
+          purchaseUsd: null,
+          nextPurchaseBelow: null,
           nextSell: {
             activate: increaseByPercent(
               price,
@@ -203,4 +205,4 @@ const remove = async (symbol: string) => {
 };
 
 export default { run };
-export { addItem, remove };
+export { addItem, remove, get, getItems };
