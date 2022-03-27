@@ -102,5 +102,11 @@ program
   .requiredOption("-s, --symbol <string>", "Symbol")
   .description("Remove a symbol")
   .action(actions.botSplitshort.remove);
+program
+  .command("bot:splitshort:update_activate")
+  .requiredOption("-s, --symbol <string>", "Symbol")
+  .requiredOption("-a, --activateSell <float>", "Sell activate usd", parseFloat)
+  .description("Updates the activate price for a symbol")
+  .action(actions.botSplitshort.updateActivate);
 
 program.parse(process.argv);

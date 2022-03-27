@@ -144,6 +144,21 @@ const get = async (): Promise<SplitShort> => {
 };
 
 /**
+ * Returns the item for a symbol
+ *
+ * @param {string} symbol
+ * @returns Promise<SplitShortItem>
+ */
+const getBySymbol = async (symbol: string): Promise<SplitShortItem> => {
+  const all = await get();
+
+  if (!all[symbol])
+    throw new Error(`Symbol ${symbol} is not present in the database`);
+
+  return all[symbol];
+};
+
+/**
  * Updates the database with the model
  *
  * @param {SplitShort} f Full structure
@@ -205,4 +220,4 @@ const remove = async (symbol: string) => {
 };
 
 export default { run };
-export { addItem, remove, get, getItems };
+export { addItem, remove, get, getItems, updateItem, getBySymbol };

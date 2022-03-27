@@ -6,7 +6,13 @@ import humanizeDuration from "humanize-duration";
 import { OptionValues } from "commander";
 import { getAllPrices, getPrice } from "../market";
 import { logger } from "../init";
-import { addItem, remove as removeSymbol, getItems } from "../bot.splitshort";
+import {
+  addItem,
+  remove as removeSymbol,
+  getItems,
+  updateItem,
+  getBySymbol,
+} from "../bot.splitshort";
 import { getItem } from "../bot.mint";
 
 const add = async (options: OptionValues) => {
@@ -30,6 +36,19 @@ const add = async (options: OptionValues) => {
 const remove = async (options: OptionValues) => {
   const { symbol } = options;
   removeSymbol(symbol);
+};
+
+const updateActivate = async (options: OptionValues) => {
+  const { symbol, activateSell } = options;
+  const item = await getBySymbol(symbol);
+  await updateItem({
+    ...item,
+    nextSell: {
+      ...item.nextSell,
+      activate: activateSell,
+    },
+  });
+  logger.info("success", { symbol, activateSell });
 };
 
 const get = async () => {
@@ -64,4 +83,4 @@ const get = async () => {
   console.log(table([columns, ...data]));
 };
 
-export default { add, remove, get };
+export default { add, remove, get, updateActivate };
