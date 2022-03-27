@@ -108,5 +108,12 @@ program
   .requiredOption("-a, --activateSell <float>", "Sell activate usd", parseFloat)
   .description("Updates the activate price for a symbol")
   .action(actions.botSplitshort.updateActivate);
+program
+  .command("bot:splitshort:update_purchase")
+  .requiredOption("-s, --symbol <string>", "Symbol")
+  .requiredOption("-u, --usd <float>", "Purchase USD", parseFloat)
+  .requiredOption("-b, --below <float>", "Purchase below price", parseFloat)
+  .description("Updates the activate price for a symbol")
+  .action(actions.botSplitshort.updatePurchase);
 
 program.parse(process.argv);

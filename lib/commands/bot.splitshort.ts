@@ -38,6 +38,19 @@ const remove = async (options: OptionValues) => {
   removeSymbol(symbol);
 };
 
+const updatePurchase = async (options: OptionValues) => {
+  const { symbol, usd, below } = options;
+  const item = await getBySymbol(symbol);
+  await updateItem({
+    ...item,
+    purchaseUsd: usd,
+    nextPurchaseBelow: below,
+    nextAction: "PURCHASE",
+    nextSell: null,
+  });
+  logger.info("success", { symbol, usd, below });
+};
+
 const updateActivate = async (options: OptionValues) => {
   const { symbol, activateSell } = options;
   const item = await getBySymbol(symbol);
@@ -83,4 +96,4 @@ const get = async () => {
   console.log(table([columns, ...data]));
 };
 
-export default { add, remove, get, updateActivate };
+export default { add, remove, get, updateActivate, updatePurchase };
