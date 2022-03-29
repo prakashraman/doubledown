@@ -127,7 +127,7 @@ const run = async () => {
       });
       // Sets the nextSell.below
 
-      let below = max([
+      const below = max([
         increaseByPercent(price, -CONFIG.BOT_SPLITSHORT_SELL_BELOW_ACTIVATE),
         item.nextSell.below,
       ]);
