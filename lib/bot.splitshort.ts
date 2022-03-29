@@ -8,7 +8,7 @@
  * it was sold
  */
 
-import { map, reduce, find, filter } from "lodash";
+import { map, reduce, find, filter, max } from "lodash";
 import moment from "moment";
 
 import {
@@ -127,14 +127,16 @@ const run = async () => {
       });
       // Sets the nextSell.below
 
+      let below = max([
+        increaseByPercent(price, -CONFIG.BOT_SPLITSHORT_SELL_BELOW_ACTIVATE),
+        item.nextSell.below,
+      ]);
+
       const updatedItem = {
         ...item,
         nextSell: {
           ...item.nextSell,
-          below: increaseByPercent(
-            price,
-            -CONFIG.BOT_SPLITSHORT_SELL_BELOW_ACTIVATE
-          ),
+          below,
         },
       };
 

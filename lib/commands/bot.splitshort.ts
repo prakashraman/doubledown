@@ -85,7 +85,7 @@ const get = async () => {
       item.symbol,
       item.nextAction,
       (item.nextSell && item.nextSell.activate) || "-",
-      (item.nextSell && item.nextSell.below) || "(pending)",
+      (item.nextSell && item.nextSell.below) || "-",
       item.nextPurchaseBelow || "-",
       item.purchaseUsd || "-",
       prices[item.symbol],
