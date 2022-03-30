@@ -64,7 +64,7 @@ const run = async () => {
         symbol,
         price,
         quantity,
-        side: "SELL",
+        side: "BUY",
       });
       console.log({ result });
 
