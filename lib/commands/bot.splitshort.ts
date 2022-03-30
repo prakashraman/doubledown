@@ -27,6 +27,7 @@ const add = async (options: OptionValues) => {
     nextSell: {
       activate: activateSell,
     },
+    nextBuy: null,
     growth: [],
   });
   logger.info("cmd additem");
@@ -39,16 +40,19 @@ const remove = async (options: OptionValues) => {
 };
 
 const updatePurchase = async (options: OptionValues) => {
-  const { symbol, usd, below } = options;
+  const { symbol, usd, activate } = options;
   const item = await getBySymbol(symbol);
   await updateItem({
     ...item,
     purchaseUsd: usd,
-    nextPurchaseBelow: below,
+    nextPurchaseBelow: null,
+    nextBuy: {
+      activate,
+    },
     nextAction: "PURCHASE",
     nextSell: null,
   });
-  logger.info("success", { symbol, usd, below });
+  logger.info("success", { symbol, usd, activate });
 };
 
 const updateActivate = async (options: OptionValues) => {
@@ -70,12 +74,13 @@ const get = async () => {
   const columns = [
     "ID",
     "Symbol",
+    "USD",
     "Next Action",
-    "Sell Activate",
-    "Sell Below",
-    "Purchase Below",
-    "Purchase USD",
-    "Current Price",
+    "S. Activate",
+    "S. Below",
+    "P. Activate",
+    "P. Above",
+    "Price",
     "Growth",
   ];
 
@@ -83,11 +88,12 @@ const get = async () => {
     return [
       item.id,
       item.symbol,
+      item.purchaseUsd || "-",
       item.nextAction,
       (item.nextSell && item.nextSell.activate) || "-",
       (item.nextSell && item.nextSell.below) || "-",
-      item.nextPurchaseBelow || "-",
-      item.purchaseUsd || "-",
+      (item.nextBuy && item.nextBuy.activate) || "-",
+      (item.nextBuy && item.nextBuy.above) || "-",
       prices[item.symbol],
       item.growth,
     ];

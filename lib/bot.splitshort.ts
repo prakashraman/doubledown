@@ -8,8 +8,7 @@
  * it was sold
  */
 
-import { map, reduce, find, filter, max } from "lodash";
-import moment from "moment";
+import { map, max, min } from "lodash";
 
 import {
   createLimitOrder,
@@ -49,15 +48,20 @@ const run = async () => {
       action: item.nextAction,
       symbol,
       price,
+      nextSell: item.nextSell,
     });
 
-    if (item.nextAction === "PURCHASE" && price < item.nextPurchaseBelow) {
+    if (
+      item.nextAction === "PURCHASE" &&
+      item.nextBuy.above &&
+      price > item.nextBuy.above
+    ) {
       const quantity = item.purchaseUsd / price;
       logger.info("bot:splitshort", {
         quantity,
         price,
         symbol,
-        action: "PURCHASE",
+        action: "PURCHASE ABOVE",
       });
 
       const result = await createLimitOrder({
@@ -66,6 +70,7 @@ const run = async () => {
         quantity,
         side: "BUY",
       });
+
       console.log({ result });
 
       const updatedBalances = await updateBalances();
@@ -74,13 +79,38 @@ const run = async () => {
         nextAction: "SELL",
         purchaseUsd: null,
         nextPurchaseBelow: null,
+        nextBuy: null,
         nextSell: {
           activate: increaseByPercent(
             price,
-            CONFIG.BOT_SPLITSHORT_SELL_ABOVE_INCREASE
+            CONFIG.BOT_SPLITSHORT_SELL_ACTIVATE
           ),
         },
         growth: [...item.growth, updatedBalances[getCoinFromSymbol(symbol)]],
+      });
+    } else if (
+      item.nextAction === "PURCHASE" &&
+      price < item.nextBuy.activate
+    ) {
+      logger.info("splitshort", {
+        bot: "splitshort",
+        action: "PURCHASE ACTIVATE",
+        symbol,
+      });
+
+      // Set the "above" to be lower than the previous above
+      // if set
+      const above = min([
+        increaseByPercent(price, CONFIG.BIT_SPLITSHORT_BUY_ABOVE_ACTIVATE),
+        item.nextBuy.above,
+      ]);
+
+      await updateItem({
+        ...item,
+        nextBuy: {
+          ...item.nextBuy,
+          above,
+        },
       });
     } else if (
       item.nextAction === "SELL" &&
@@ -106,10 +136,13 @@ const run = async () => {
       await updateItem({
         ...item,
         nextAction: "PURCHASE",
-        nextPurchaseBelow: increaseByPercent(
-          price,
-          -CONFIG.BOT_SPLITSHORT_BUY_BELOW_INCREASE
-        ),
+        nextSell: null,
+        nextBuy: {
+          activate: increaseByPercent(
+            price,
+            -CONFIG.BIT_SPLITSHORT_BUY_ACTIVATE
+          ),
+        },
         purchaseUsd: result.filledQuantity * price,
       });
     } else if (

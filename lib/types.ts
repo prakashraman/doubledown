@@ -141,6 +141,16 @@ type SplitShortItem = {
     below?: number | null;
     activate: number;
   };
+
+  // Determines when the BUY workflow would go into motion
+  // Once the price reaches below the "activate" the "nextBuy.above" is set
+  // And once price reached above "nextBuy.above" BUY is executed
+  nextBuy?: {
+    above?: number | null;
+    activate: number;
+  };
+
+  // deprecated
   nextPurchaseBelow?: number;
 
   // When a PURCHASE is made the new balance of the coin will be inserted
